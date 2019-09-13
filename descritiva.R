@@ -18,7 +18,8 @@ dplyr::glimpse(df)
 table(df$Tipo)
 
 
-aaaaa
+# aaaaa
+### aaaa
 {
   set.seed(1)
   index <- caret::createDataPartition(df$Tipo, p = 0.75, list = FALSE) 
