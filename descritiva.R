@@ -30,7 +30,7 @@ table(df$Tipo)
                                classProbs = T,
                                savePredictions = T,
                                verboseIter = FALSE,
-                               allowParallel = TRUE)
+                               summaryFunction = specmine::multiiClassSummary)
   
   model1_r_rf <- caret::train(y = train$Tipo,
                               x = train[, "Tipo"],
