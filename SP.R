@@ -135,6 +135,3 @@ df_rf_original_up <- data.frame(Acuracia = cm_original_up$overall[1],
 
 models <- df_rf_original %>% 
   dplyr::bind_rows(df_rf_original_up, df_rf_original_down)
-
-
-
