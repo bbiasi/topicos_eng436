@@ -18,6 +18,7 @@ library(caret)
 library(e1071)
 library(randomForest)
 library(multiROC)
+library(tidyr)
 
 ##Manipulando o banco de dados----
 
@@ -115,23 +116,64 @@ cm_original_down <- confusionMatrix(predictions_down, test_data$Tipo)
 
 ##ComparaÃ§Ã£o RF's----
 
-df_rf_original <- data.frame(Acuracia = cm_original$overall[1],
-                          kappa  = cm_original$overall[2],
-                          Sentit = cm_original$byClass[1],
-                          Especi = cm_original$byClass[2],
-                          F1 = cm_original$byClass[7])
+#1) Ss, Sp e F1
+df_rf_original <- data.frame(Modelo = "Original",
+                          Sensitividade = cm_original$byClass[1:6],
+                          Especificidade = cm_original$byClass[7:12],
+                          F1 = cm_original$byClass[37:42])
 
-df_rf_original_down <- data.frame(Acuracia = cm_original_down$overall[1],
-                             kappa  = cm_original_down$overall[2],
-                             Sentit = cm_original_down$byClass[1],
-                             Especi = cm_original_down$byClass[2],
-                             F1 = cm_original_down$byClass[7])
+df_rf_original_down <- data.frame(Modelo = "Under",
+                             Sensitividade = cm_original_down$byClass[1:6],
+                             Especificidade = cm_original_down$byClass[7:12],
+                             F1 = cm_original_down$byClass[37:42])
 
-df_rf_original_up <- data.frame(Acuracia = cm_original_up$overall[1],
-                             kappa  = cm_original_up$overall[2],
-                             Sentit = cm_original_up$byClass[1],
-                             Especi = cm_original_up$byClass[2],
-                             F1 = cm_original_up$byClass[7])
+df_rf_original_up <- data.frame(Modelo = "Over",
+                             Sensitividade = cm_original_up$byClass[1:6],
+                             Especificidade = cm_original_up$byClass[7:12],
+                             F1 = cm_original_up$byClass[37:42])
+
+#2) Acc, Kappa
+
+df_rf_original1 <- data.frame(Modelo = "Original",
+                              Acurácia = cm_original$overall[1],
+                              Kappa = cm_original$overall[2])
+
+df_rf_original_down1 <- data.frame(Modelo = "Under",
+                                  Acurácia = cm_original_down$overall[1],
+                                  Kappa = cm_original_down$overall[2])
+df_rf_original_up1 <- data.frame(Modelo = "Over",
+                                 Acurácia = cm_original_up$overall[1],
+                                 Kappa = cm_original_up$overall[2])
+
+###Data.frame das métricas
 
 models <- df_rf_original %>% 
-  dplyr::bind_rows(df_rf_original_up, df_rf_original_down)
+  dplyr::bind_rows(df_rf_original_up, df_rf_original_down) %>% 
+  mutate(Classe = rep(paste0(rep(paste0("X"), 5),setdiff(1:7,4)), 3),
+         Classe=as.factor(Classe))
+
+models1 <- df_rf_original1 %>% 
+  dplyr::bind_rows(df_rf_original_up1, df_rf_original_down1)
+
+###PLOT DAS MÉTRICAS Ss, Sp, F1
+
+g1 <- models %>% 
+  reshape2::melt(id.vars=c("Modelo","Classe")) %>%
+  ggplot(aes(x = variable, y = value, color = Modelo)) +
+  geom_jitter(width = 0.2, alpha = 0.5, size = 3)+
+  facet_wrap(~Classe,ncol = length(levels(models$Classe)))+
+  theme(axis.text.x  = element_text(angle = 90),legend.position = "bottom")+
+  xlab("Variável")+
+  ylab("Valor")
+plotly::ggplotly(g1)
+
+###PLOT DAS MÉTRICAS Acc, Kappa
+
+g2 <- models1 %>%
+  gather(x, y, Acurácia:Kappa) %>% 
+  ggplot(aes(x = x, y = y, color = Modelo)) +
+  geom_jitter(width = 0.2, alpha = 0.5, size = 3)+
+  theme(axis.text.x  = element_text(angle = 90),legend.position = "bottom")+
+  xlab("Variável")+
+  ylab("Valor")
+plotly::ggplotly(g2)
