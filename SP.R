@@ -135,17 +135,17 @@ df_rf_original_up <- data.frame(Modelo = "Over",
 #2) Acc, Kappa
 
 df_rf_original1 <- data.frame(Modelo = "Original",
-                              Acurácia = cm_original$overall[1],
+                              Acuracia = cm_original$overall[1],
                               Kappa = cm_original$overall[2])
 
 df_rf_original_down1 <- data.frame(Modelo = "Under",
-                                  Acurácia = cm_original_down$overall[1],
+                                  Acuracia = cm_original_down$overall[1],
                                   Kappa = cm_original_down$overall[2])
 df_rf_original_up1 <- data.frame(Modelo = "Over",
-                                 Acurácia = cm_original_up$overall[1],
+                                 Acuracia = cm_original_up$overall[1],
                                  Kappa = cm_original_up$overall[2])
 
-###Data.frame das métricas
+###Data.frame das m?tricas
 
 models <- df_rf_original %>% 
   dplyr::bind_rows(df_rf_original_up, df_rf_original_down) %>% 
@@ -155,7 +155,7 @@ models <- df_rf_original %>%
 models1 <- df_rf_original1 %>% 
   dplyr::bind_rows(df_rf_original_up1, df_rf_original_down1)
 
-###PLOT DAS MÉTRICAS Ss, Sp, F1
+###PLOT DAS M?TRICAS Ss, Sp, F1
 
 g1 <- models %>% 
   reshape2::melt(id.vars=c("Modelo","Classe")) %>%
@@ -163,17 +163,62 @@ g1 <- models %>%
   geom_jitter(width = 0.2, alpha = 0.5, size = 3)+
   facet_wrap(~Classe,ncol = length(levels(models$Classe)))+
   theme(axis.text.x  = element_text(angle = 90),legend.position = "bottom")+
-  xlab("Variável")+
+  xlab("Variavel")+
   ylab("Valor")
 plotly::ggplotly(g1)
 
-###PLOT DAS MÉTRICAS Acc, Kappa
+ggsave(filename = "metricas_classe.png",plot = g1,width = 13,height = 7,dpi = 300)
+###PLOT DAS M?TRICAS Acc, Kappa
 
 g2 <- models1 %>%
-  gather(x, y, Acurácia:Kappa) %>% 
+  gather(x, y, Acuracia:Kappa) %>% 
   ggplot(aes(x = x, y = y, color = Modelo)) +
   geom_jitter(width = 0.2, alpha = 0.5, size = 3)+
   theme(axis.text.x  = element_text(angle = 90),legend.position = "bottom")+
-  xlab("Variável")+
+  xlab("Variavel")+
   ylab("Valor")
 plotly::ggplotly(g2)
+
+ggsave(filename = "metricas_geral.png",plot = g2,width = 13,height = 7,dpi = 300)
+
+##CURVA ROC----
+
+###Original 
+
+predictions1 <- predict(model_rf,test_data,type="prob")
+colnames(predictions1) <- paste(colnames(predictions1), "_pred_original")
+
+###Up
+
+predictions_up1 <- predict(model_rf_up,test_data,type="prob")
+colnames(predictions_up1) <- paste(colnames(predictions_up1), "_pred_up")
+###Juntando
+
+true_label <- dummies::dummy(test_data$Tipo, sep = ".")
+true_label <- data.frame(true_label)
+colnames(true_label) <- gsub(".*?\\.", "", colnames(true_label))
+colnames(true_label) <- paste(colnames(true_label), "_true")
+final_df <- cbind(true_label, predictions1, predictions_up1)
+
+###PLotando curva
+
+roc_res <- multi_roc(final_df, force_diag=T)
+pr_res <- multi_pr(final_df, force_diag=T)
+plot_roc_df <- plot_roc_data(roc_res)
+plot_pr_df <- plot_pr_data(pr_res)
+plot_roc_df <- plot_roc_df %>% 
+  mutate(alpha=ifelse(plot_roc_df$Group=="Micro"|plot_roc_df$Group=="Macro",1,0))
+
+g3 <- ggplot(plot_roc_df, aes(x = 1-Specificity, y=Sensitivity)) +
+  geom_path(aes(color = Group, linetype=Method,alpha=alpha), size=1.5) +
+  geom_segment(aes(x = 0, y = 0, xend = 1, yend = 1), 
+               colour='grey', linetype = 'dotdash') +
+  scale_alpha(range=c(0.1, 1))+
+  theme_bw() + 
+  theme(plot.title = element_text(hjust = 0.5), 
+        legend.justification=c(1, 0), legend.position=c(.95, .05),
+        legend.title=element_blank(), 
+        legend.background = element_rect(fill=NULL, size=0.5, 
+                                         linetype="solid", colour ="black"))
+plotly::ggplotly(g3)
+ggsave(filename = "curva_roc.png",plot = g3,width = 13,height = 7,dpi = 300)
