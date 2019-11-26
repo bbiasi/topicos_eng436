@@ -35,6 +35,10 @@ levels(df$Tipo) <- make.names(levels(factor(df$Tipo)))
 dplyr::glimpse(df)
 table(df$Tipo)
 
+
+library(skimr)
+skimmed <- skim_to_wide(df)
+skimmed[, c(1:5, 9:11, 13, 15:16)]
 ##Teste-Treino----
 
 set.seed(42)
@@ -84,6 +88,7 @@ set.seed(42)
 model_rf_up <- caret::train(Tipo ~ .,
                          data = train_data,
                          method = "rf",
+                         ntree = 500,
                          preProcess = c("scale", "center"),
                          trControl = trainControl(method  = "cv", 
                                                   number  = 10,
@@ -160,9 +165,12 @@ models1 <- df_rf_original1 %>%
 g1 <- models %>% 
   reshape2::melt(id.vars=c("Modelo","Classe")) %>%
   ggplot(aes(x = variable, y = value, color = Modelo)) +
-  geom_jitter(width = 0.2, alpha = 0.5, size = 3)+
+  geom_jitter(width = 0.2, alpha = 1, size = 5)+
   facet_wrap(~Classe,ncol = length(levels(models$Classe)))+
   theme(axis.text.x  = element_text(angle = 90),legend.position = "bottom")+
+  theme(axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        axis.text = element_text(face = "bold"))+
   xlab("Variavel")+
   ylab("Valor")
 plotly::ggplotly(g1)
@@ -173,8 +181,11 @@ ggsave(filename = "metricas_classe.png",plot = g1,width = 13,height = 7,dpi = 30
 g2 <- models1 %>%
   gather(x, y, Acuracia:Kappa) %>% 
   ggplot(aes(x = x, y = y, color = Modelo)) +
-  geom_jitter(width = 0.2, alpha = 0.5, size = 3)+
+  geom_jitter(width = 0.2, alpha = 1, size = 5)+
   theme(axis.text.x  = element_text(angle = 90),legend.position = "bottom")+
+  theme(axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        axis.text = element_text(face = "bold"))+
   xlab("Variavel")+
   ylab("Valor")
 plotly::ggplotly(g2)
@@ -214,6 +225,8 @@ g3 <- ggplot(plot_roc_df, aes(x = 1-Specificity, y=Sensitivity)) +
   geom_segment(aes(x = 0, y = 0, xend = 1, yend = 1), 
                colour='grey', linetype = 'dotdash') +
   scale_alpha(range=c(0.1, 1))+
+  xlab("1-Especificidade")+
+  ylab("Sensitividade")
   theme_bw() + 
   theme(plot.title = element_text(hjust = 0.5), 
         legend.justification=c(1, 0), legend.position=c(.95, .05),
@@ -222,3 +235,34 @@ g3 <- ggplot(plot_roc_df, aes(x = 1-Specificity, y=Sensitivity)) +
                                          linetype="solid", colour ="black"))
 plotly::ggplotly(g3)
 ggsave(filename = "curva_roc.png",plot = g3,width = 13,height = 7,dpi = 300)
+
+###OOB
+
+ccc <- model_rf_up$finalModel
+ccc <- as.data.frame(ccc[["err.rate"]])
+
+df_oob <- ccc %>% 
+  dplyr::mutate(tree = 1:500) %>% 
+  reshape2::melt(id.vars = "tree") %>% 
+  mutate(alpha=ifelse(variable=="OOB",1,0))
+
+# OOB com ggplot2
+
+plot_oob <- ggplot2::ggplot(df_oob) +
+  geom_line(aes(x = tree, y = value, col = variable,alpha=alpha), 
+            size = 1) +
+  xlab("N° Árvores") + 
+  ylab("Erro") +
+  labs(col = "Legenda") +
+  theme(legend.position = "bottom")+
+  scale_alpha(range=c(0.25, 1))
+
+plotly::ggplotly(plot_oob)
+plot_oob
+
+#df_oob_mean <- ccc %>% 
+ # dplyr::mutate(tree = 1:500) %>% 
+  #reshape2::melt(id.vars = "tree") %>% 
+  #filter(variable!="OOB") %>% 
+  #group_by(tree) %>% 
+  #summarise(Média=mean(value))
