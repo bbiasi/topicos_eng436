@@ -1,24 +1,14 @@
 setwd("C:/Users/MARCELLO/Desktop/ENG436/topicos_eng436")
 
-#Análise supervisionada
+#Analise supervisionada
 
 ##Bibliotecas----
 
-library(readxl)
-library(dplyr)
-library(ggplot2)
-library(cowplot)
-library(plotly)
-library(GGally)
-library(tibble)
-library(clValid)
-library(lemon)
-library(factoextra)
-library(caret)
-library(e1071)
-library(randomForest)
-library(multiROC)
-library(tidyr)
+if (!require("pacman")) install.packages("pacman")
+
+pacman::p_load(dplyr, tidyr, ggplot2, caret, cowplot, 
+               randomForest, reshape2, multiROC, readxl, plotly, 
+               tibble, GGally, lemon, factoextra, e1071)
 
 ##Manipulando o banco de dados----
 
@@ -28,6 +18,7 @@ dplyr::glimpse(dataset)
 df <- dataset %>% 
   dplyr::mutate_if(is.character, as.numeric) %>% 
   dplyr::mutate(Tipo = as.factor(Type)) %>% 
+  dplyr::mutate(RI = RI/1e5) %>% 
   dplyr::select(-Type)
 
 levels(df$Tipo) <- make.names(levels(factor(df$Tipo)))
@@ -35,10 +26,27 @@ levels(df$Tipo) <- make.names(levels(factor(df$Tipo)))
 dplyr::glimpse(df)
 table(df$Tipo)
 
+##Outliers----
 
-library(skimr)
-skimmed <- skim_to_wide(df)
-skimmed[, c(1:5, 9:11, 13, 15:16)]
+df <- df %>% 
+  tibble::rowid_to_column() %>% 
+  dplyr::select(1:11)
+
+df1 <- df %>% 
+  dplyr::filter(rowid %in% c("107","108","164","173","175"))%>% 
+  dplyr::mutate(Out = 1)
+
+df <- df1 %>% 
+  dplyr::right_join(df, by = "rowid") %>% 
+  dplyr::select(c(1, 12:22)) %>% 
+  dplyr::mutate(Out = ifelse(is.na(Out), 0, 1)) %>% 
+  dplyr::select(1, 3:12, 2) %>% 
+  dplyr::mutate(Out = as.factor(Out)) %>% 
+  dplyr::filter(Out==0) %>% 
+  dplyr::select(c(2:11))
+
+colnames(df) <- c("RI", "Na","Mg","Al","Si","K","Ca","Ba","Fe","Tipo")
+
 ##Teste-Treino----
 
 set.seed(42)
@@ -63,23 +71,6 @@ model_rf <- caret::train(Tipo ~ .,
 predictions <- predict(model_rf,test_data)
 cm_original <- confusionMatrix(predictions, test_data$Tipo)
   
-##KNN----
-
-set.seed(42)
-model_knn <- caret::train(Tipo ~ .,
-                         data = train_data,
-                         method = "knn",
-                         preProcess = c("scale", "center"),
-                         trControl = trainControl(method  = "cv", 
-                                                  number  = 10,
-                                                  classProbs = T,
-                                                  savePredictions = T,
-                                                  verboseIter = FALSE))
-
-
-predictions_knn <- predict(model_knn,test_data)
-cm_original_knn <- confusionMatrix(predictions_knn, test_data$Tipo)
-
 ##RF Resample----
 
 ###UP
@@ -88,7 +79,6 @@ set.seed(42)
 model_rf_up <- caret::train(Tipo ~ .,
                          data = train_data,
                          method = "rf",
-                         ntree = 500,
                          preProcess = c("scale", "center"),
                          trControl = trainControl(method  = "cv", 
                                                   number  = 10,
@@ -99,7 +89,7 @@ model_rf_up <- caret::train(Tipo ~ .,
 
 
 predictions_up <- predict(model_rf_up,test_data)
-cm_original_up <- confusionMatrix(predictions_up, test_data$Tipo)
+cm_up <- confusionMatrix(predictions_up, test_data$Tipo)
 
 ###DOWN
 
@@ -117,25 +107,26 @@ model_rf_down <- caret::train(Tipo ~ .,
 
 
 predictions_down <- predict(model_rf_down,test_data)
-cm_original_down <- confusionMatrix(predictions_down, test_data$Tipo)
+cm_down <- confusionMatrix(predictions_down, test_data$Tipo)
 
-##Comparação RF's----
+##Comparando RF's----
 
 #1) Ss, Sp e F1
+
 df_rf_original <- data.frame(Modelo = "Original",
                           Sensitividade = cm_original$byClass[1:6],
                           Especificidade = cm_original$byClass[7:12],
                           F1 = cm_original$byClass[37:42])
 
-df_rf_original_down <- data.frame(Modelo = "Under",
-                             Sensitividade = cm_original_down$byClass[1:6],
-                             Especificidade = cm_original_down$byClass[7:12],
-                             F1 = cm_original_down$byClass[37:42])
+df_rf_down <- data.frame(Modelo = "Under",
+                             Sensitividade = cm_down$byClass[1:6],
+                             Especificidade = cm_down$byClass[7:12],
+                             F1 = cm_down$byClass[37:42])
 
-df_rf_original_up <- data.frame(Modelo = "Over",
-                             Sensitividade = cm_original_up$byClass[1:6],
-                             Especificidade = cm_original_up$byClass[7:12],
-                             F1 = cm_original_up$byClass[37:42])
+df_rf_up <- data.frame(Modelo = "Over",
+                             Sensitividade = cm_up$byClass[1:6],
+                             Especificidade = cm_up$byClass[7:12],
+                             F1 = cm_up$byClass[37:42])
 
 #2) Acc, Kappa
 
@@ -143,24 +134,24 @@ df_rf_original1 <- data.frame(Modelo = "Original",
                               Acuracia = cm_original$overall[1],
                               Kappa = cm_original$overall[2])
 
-df_rf_original_down1 <- data.frame(Modelo = "Under",
-                                  Acuracia = cm_original_down$overall[1],
-                                  Kappa = cm_original_down$overall[2])
-df_rf_original_up1 <- data.frame(Modelo = "Over",
-                                 Acuracia = cm_original_up$overall[1],
-                                 Kappa = cm_original_up$overall[2])
+df_rf_down1 <- data.frame(Modelo = "Under",
+                                  Acuracia = cm_down$overall[1],
+                                  Kappa = cm_down$overall[2])
+df_rf_up1 <- data.frame(Modelo = "Over",
+                                 Acuracia = cm_up$overall[1],
+                                 Kappa = cm_up$overall[2])
 
-###Data.frame das m?tricas
+###Data.frame das metricas
 
 models <- df_rf_original %>% 
-  dplyr::bind_rows(df_rf_original_up, df_rf_original_down) %>% 
+  dplyr::bind_rows(df_rf_up, df_rf_down) %>% 
   mutate(Classe = rep(paste0(rep(paste0("X"), 5),setdiff(1:7,4)), 3),
          Classe=as.factor(Classe))
 
 models1 <- df_rf_original1 %>% 
-  dplyr::bind_rows(df_rf_original_up1, df_rf_original_down1)
+  dplyr::bind_rows(df_rf_up1, df_rf_down1)
 
-###PLOT DAS M?TRICAS Ss, Sp, F1
+###PLOT Ss, Sp, F1
 
 g1 <- models %>% 
   reshape2::melt(id.vars=c("Modelo","Classe")) %>%
@@ -176,7 +167,8 @@ g1 <- models %>%
 plotly::ggplotly(g1)
 
 ggsave(filename = "metricas_classe.png",plot = g1,width = 13,height = 7,dpi = 300)
-###PLOT DAS M?TRICAS Acc, Kappa
+
+###PLOT Acc, Kappa
 
 g2 <- models1 %>%
   gather(x, y, Acuracia:Kappa) %>% 
@@ -203,6 +195,7 @@ colnames(predictions1) <- paste(colnames(predictions1), "_pred_original")
 
 predictions_up1 <- predict(model_rf_up,test_data,type="prob")
 colnames(predictions_up1) <- paste(colnames(predictions_up1), "_pred_up")
+
 ###Juntando
 
 true_label <- dummies::dummy(test_data$Tipo, sep = ".")
@@ -236,7 +229,7 @@ g3 <- ggplot(plot_roc_df, aes(x = 1-Specificity, y=Sensitivity)) +
 plotly::ggplotly(g3)
 ggsave(filename = "curva_roc.png",plot = g3,width = 13,height = 7,dpi = 300)
 
-###OOB
+##OOB----
 
 ccc <- model_rf_up$finalModel
 ccc <- as.data.frame(ccc[["err.rate"]])
@@ -246,19 +239,16 @@ df_oob <- ccc %>%
   reshape2::melt(id.vars = "tree") %>% 
   mutate(alpha=ifelse(variable=="OOB",1,0))
 
-# OOB com ggplot2
-
 plot_oob <- ggplot2::ggplot(df_oob) +
   geom_line(aes(x = tree, y = value, col = variable,alpha=alpha), 
             size = 1) +
-  xlab("N° Árvores") + 
+  xlab("Num. de Arvores") + 
   ylab("Erro") +
   labs(col = "Legenda") +
   theme(legend.position = "bottom")+
   scale_alpha(range=c(0.25, 1))
 
 plotly::ggplotly(plot_oob)
-plot_oob
 
 #df_oob_mean <- ccc %>% 
  # dplyr::mutate(tree = 1:500) %>% 
