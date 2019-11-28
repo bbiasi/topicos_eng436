@@ -249,10 +249,3 @@ plot_oob <- ggplot2::ggplot(df_oob) +
   scale_alpha(range=c(0.25, 1))
 
 plotly::ggplotly(plot_oob)
-
-#df_oob_mean <- ccc %>% 
- # dplyr::mutate(tree = 1:500) %>% 
-  #reshape2::melt(id.vars = "tree") %>% 
-  #filter(variable!="OOB") %>% 
-  #group_by(tree) %>% 
-  #summarise(Média=mean(value))
