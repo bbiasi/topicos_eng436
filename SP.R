@@ -60,7 +60,7 @@ set.seed(42)
 model_rf <- caret::train(Tipo ~ .,
                          data = train_data,
                          method = "rf",
-                         ntree = 1500,
+                         ntree = 1000,
                          preProcess = c("scale", "center"),
                          trControl = trainControl(method  = "cv", 
                                                    number  = 10,
@@ -80,7 +80,7 @@ set.seed(42)
 model_rf_up <- caret::train(Tipo ~ .,
                          data = train_data,
                          method = "rf",
-                         ntree = 1500,
+                         ntree = 1000,
                          preProcess = c("scale", "center"),
                          trControl = trainControl(method  = "cv", 
                                                   number  = 10,
@@ -99,7 +99,7 @@ set.seed(42)
 model_rf_down <- caret::train(Tipo ~ .,
                             data = train_data,
                             method = "rf",
-                            ntree = 1500,
+                            ntree = 1000,
                             preProcess = c("scale", "center"),
                             trControl = trainControl(method  = "cv", 
                                                      number  = 10,
@@ -201,8 +201,8 @@ colnames(predictions_up1) <- paste(colnames(predictions_up1), "_pred_up")
 
 ###DOWN
 
-predictions_down1 <- predict(model_rf_down,test_data,type="prob")
-colnames(predictions_down1) <- paste(colnames(predictions_down1), "_pred_down")
+#predictions_down1 <- predict(model_rf_down,test_data,type="prob")
+#colnames(predictions_down1) <- paste(colnames(predictions_down1), "_pred_down")
 
 ###Juntando
 
@@ -210,7 +210,7 @@ true_label <- dummies::dummy(test_data$Tipo, sep = ".")
 true_label <- data.frame(true_label)
 colnames(true_label) <- gsub(".*?\\.", "", colnames(true_label))
 colnames(true_label) <- paste(colnames(true_label), "_true")
-final_df <- cbind(true_label, predictions1, predictions_up1,predictions_down1)
+final_df <- cbind(true_label, predictions1, predictions_up1)#predictions_down1)
 
 ###PLotando curva
 
@@ -239,34 +239,13 @@ ggsave(filename = "curva_roc.png",plot = g3,width = 13,height = 7,dpi = 300)
 
 ##OOB----
 
-###ORIGINAL
-
-ccc <- model_rf$finalModel
-ccc <- as.data.frame(ccc[["err.rate"]])
-
-df_oob <- ccc %>% 
-  dplyr::mutate(tree = 1:1500) %>% 
-  reshape2::melt(id.vars = "tree") %>% 
-  mutate(alpha=ifelse(variable=="OOB",1,0))
-
-plot_oob <- ggplot2::ggplot(df_oob) +
-  geom_line(aes(x = tree, y = value, col = variable,alpha=alpha), 
-            size = 1) +
-  xlab("Num. de Arvores") + 
-  ylab("Erro") +
-  labs(col = "Legenda") +
-  theme(legend.position = "bottom")+
-  scale_alpha(range=c(0.25, 1))
-
-plotly::ggplotly(plot_oob)
-
 ###UP
 
 ccc_up <- model_rf_up$finalModel
 ccc_up <- as.data.frame(ccc_up[["err.rate"]])
 
 df_oob_up <- ccc_up %>% 
-  dplyr::mutate(tree = 1:1500) %>% 
+  dplyr::mutate(tree = 1:1000) %>% 
   reshape2::melt(id.vars = "tree") %>% 
   mutate(alpha=ifelse(variable=="OOB",1,0))
 
@@ -280,45 +259,9 @@ plot_oob_up <- ggplot2::ggplot(df_oob_up) +
   scale_alpha(range=c(0.25, 1))
 
 plotly::ggplotly(plot_oob_up)
-
-###DOWN
-
-ccc_down <- model_rf_down$finalModel
-ccc_down <- as.data.frame(ccc_down[["err.rate"]])
-
-df_oob_down <- ccc_down %>% 
-  dplyr::mutate(tree = 1:1500) %>% 
-  reshape2::melt(id.vars = "tree") %>% 
-  mutate(alpha=ifelse(variable=="OOB",1,0))
-
-plot_oob_down <- ggplot2::ggplot(df_oob_down) +
-  geom_line(aes(x = tree, y = value, col = variable,alpha=alpha), 
-            size = 1) +
-  xlab("Num. de Arvores") + 
-  ylab("Erro") +
-  labs(col = "Legenda") +
-  theme(legend.position = "bottom")+
-  scale_alpha(range=c(0.25, 1))
-
-plotly::ggplotly(plot_oob_down)
+ggsave(filename = "oob.png",plot = plot_oob_up,width = 13,height = 7,dpi = 300)
 
 ##Plots f(mtry)----
-
-###ORIGNAL
-
-g4 <- ggplot(model_rf$results) +
-  geom_line(aes(x = mtry, y = Accuracy)) +
-  geom_point(aes(x = mtry, y = Accuracy)) +
-  geom_errorbar(aes(x = mtry, ymin = Accuracy - AccuracySD, ymax = Accuracy + AccuracySD), width = 0.3)+
-  theme_bw()
-g4
-
-g5 <- ggplot(model_rf$results) +
-  geom_line(aes(x = mtry, y = Kappa)) +
-  geom_point(aes(x = mtry, y = Kappa)) +
-  geom_errorbar(aes(x = mtry, ymin = Kappa - KappaSD, ymax = Kappa + KappaSD), width = 0.3)+
-  theme_bw()
-g5
 
 ###UP
 
@@ -335,19 +278,3 @@ g7 <- ggplot(model_rf_up$results) +
   geom_errorbar(aes(x = mtry, ymin = Kappa - KappaSD, ymax = Kappa + KappaSD), width = 0.3)+
   theme_bw()
 g7
-
-###DOWN
-
-g8 <- ggplot(model_rf_down$results) +
-  geom_line(aes(x = mtry, y = Accuracy)) +
-  geom_point(aes(x = mtry, y = Accuracy)) +
-  geom_errorbar(aes(x = mtry, ymin = Accuracy - AccuracySD, ymax = Accuracy + AccuracySD), width = 0.3)+
-  theme_bw()
-g8
-
-g9 <- ggplot(model_rf_down$results) +
-  geom_line(aes(x = mtry, y = Kappa)) +
-  geom_point(aes(x = mtry, y = Kappa)) +
-  geom_errorbar(aes(x = mtry, ymin = Kappa - KappaSD, ymax = Kappa + KappaSD), width = 0.3)+
-  theme_bw()
-g9
