@@ -33,7 +33,7 @@ df <- df %>%
   dplyr::select(1:11)
 
 df1 <- df %>% 
-  dplyr::filter(rowid %in% c("107","108","164","173","175"))%>% 
+  dplyr::filter(rowid %in% c("107","108","164"))%>% 
   dplyr::mutate(Out = 1)
 
 df <- df1 %>% 
@@ -60,7 +60,7 @@ set.seed(42)
 model_rf <- caret::train(Tipo ~ .,
                          data = train_data,
                          method = "rf",
-                         ntree = 1000,
+                         ntree = 1500,
                          preProcess = c("scale", "center"),
                          trControl = trainControl(method  = "cv", 
                                                    number  = 10,
@@ -80,7 +80,7 @@ set.seed(42)
 model_rf_up <- caret::train(Tipo ~ .,
                          data = train_data,
                          method = "rf",
-                         ntree = 1000,
+                         ntree = 1500,
                          preProcess = c("scale", "center"),
                          trControl = trainControl(method  = "cv", 
                                                   number  = 10,
@@ -99,7 +99,7 @@ set.seed(42)
 model_rf_down <- caret::train(Tipo ~ .,
                             data = train_data,
                             method = "rf",
-                            ntree = 1000,
+                            ntree = 1500,
                             preProcess = c("scale", "center"),
                             trControl = trainControl(method  = "cv", 
                                                      number  = 10,
@@ -117,17 +117,17 @@ cm_down <- confusionMatrix(predictions_down, test_data$Tipo)
 #1) Ss, Sp e F1
 
 df_rf_original <- data.frame(Modelo = "Original",
-                          Sensitividade = cm_original$byClass[1:6],
+                          Sensibilidade = cm_original$byClass[1:6],
                           Especificidade = cm_original$byClass[7:12],
                           F1 = cm_original$byClass[37:42])
 
 df_rf_down <- data.frame(Modelo = "Under",
-                             Sensitividade = cm_down$byClass[1:6],
+                             Sensibilidade = cm_down$byClass[1:6],
                              Especificidade = cm_down$byClass[7:12],
                              F1 = cm_down$byClass[37:42])
 
 df_rf_up <- data.frame(Modelo = "Over",
-                             Sensitividade = cm_up$byClass[1:6],
+                             Sensibilidade = cm_up$byClass[1:6],
                              Especificidade = cm_up$byClass[7:12],
                              F1 = cm_up$byClass[37:42])
 
@@ -245,7 +245,7 @@ ccc_up <- model_rf_up$finalModel
 ccc_up <- as.data.frame(ccc_up[["err.rate"]])
 
 df_oob_up <- ccc_up %>% 
-  dplyr::mutate(tree = 1:1000) %>% 
+  dplyr::mutate(tree = 1:1500) %>% 
   reshape2::melt(id.vars = "tree") %>% 
   mutate(alpha=ifelse(variable=="OOB",1,0))
 
