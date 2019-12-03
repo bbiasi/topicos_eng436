@@ -227,7 +227,7 @@ g3 <- ggplot(plot_roc_df, aes(x = 1-Specificity, y=Sensitivity)) +
                colour='grey', linetype = 'dotdash') +
   scale_alpha(range=c(0.05, 1))+
   xlab("1-Especificidade")+
-  ylab("Sensitividade")
+  ylab("Sensibilidade")
   theme_bw() + 
   theme(plot.title = element_text(hjust = 0.5), 
         legend.justification=c(1, 0), legend.position=c(.95, .05),
