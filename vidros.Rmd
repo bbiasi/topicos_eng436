@@ -18,6 +18,9 @@ pre code, pre, code {
   word-break: keep-all !important;
   word-wrap: initial !important;
 }
+body {
+text-align: justify}
+p {line-height: 2em;}
 </style>
 
 
@@ -60,7 +63,7 @@ knitr::include_graphics(if (identical(knitr:::pandoc_to(), 'html')) cover_url el
 
 \
 O presente trabalho foi desenvolvido como parte de avaliação para a disciplina Tópicos Especiais em Engenharia, ministrada pela docente Karla Esquerre da Escola Politécnica da UFBA.
-\
+\newline
 
 </p>
 
@@ -71,9 +74,9 @@ O presente trabalho foi desenvolvido como parte de avaliação para a disciplina
 <p style="text-align: justify">
 
 Vestígios deixados na cena de um crime podem ser de extrema importância para a resolução do mesmo. Utilizando dos conhecimentos que envolvem o aprendizado de máquina, é possível construir modelos preditivos que deem suporte as análises e obter importantes informações sobre padrões de banco de dados criminológicos. 
-\
+\newline
 Diferentes estudos utilizam algoritmos de aprendizado de máquina para tarefas de classificação, procurando otimizar os modelos com variadas técnicas. No presente trabalho fora proposto um modelo preditivo de classificação de vidro multiclasse, utilizando do algoritmo de Random Forest para diferentes cenários de variáveis e técnicas de balanceamento de classes.
-\
+\newline
 
 </p>
 
@@ -83,9 +86,9 @@ Diferentes estudos utilizam algoritmos de aprendizado de máquina para tarefas d
 <p style="text-align: justify">
 
 O presente *dataset* em análise é um conjunto de objetos de identificação de vidro da UC Irvine Machine Learning Repository, disponível no [Kaggle](https://www.kaggle.com/uciml/glass), contendo 10 atributos, sendo a resposta o tipo do vidro (*label* / rótulo). 
-\
+\newline
 Os atributos em análise são:
-\
+\newline
 
 * 01- RI: Índice de Refração;
 
@@ -119,11 +122,10 @@ Os atributos em análise são:
   
   + X7 - [*headlamps*](https://www.google.com/search?q=headlamps&rlz=1C1ASUT_pt-BRBR683BR683&sxsrf=ACYBGNTmAvcoSNgIaLA95Js1S3mU0QBewQ:1575247410575&source=lnms&tbm=isch&sa=X&ved=2ahUKEwjsu9zy3ZXmAhXMo1kKHQItBEQQ_AUoAnoECA0QBA&biw=1366&bih=657).
   
-\
+\newline
 
-\
 Abaixo, iniciamos o código indicando o caminho da pasta de trabalho, carregando os pacotes demandados e o *dataset* a ser analisado. O uso do pacote `pacman` foi idealizado em facilitar a reprodutibilidade, dinamicidade de instalação e carregamento de pacotes. Especificamente o pacote `gg3D` demanda que o *download* seja realizado diretamente do **git**, e para tal, utilizamos o pacote `remotes`.
-\
+\newline
 
 </p>
 
@@ -151,7 +153,7 @@ dataset <- readxl::read_excel("glass.xlsx")
 <p style="text-align: justify">
 
 O primeiro passo para qualquer estruturação ou análise, é o conhecimento acerca da estrutura inicial dos dados. Para tanto, utilizaremos a função `glimpse` do pacote `dplyr`.
-\
+\newline
 
 </p>
 
@@ -162,9 +164,9 @@ dplyr::glimpse(dataset)
 <p style="text-align: justify">
 
 Podemos observar que apenas a variável preditora **RI** está como *dbl* (*double*). Deste modo, transformaremos as *chr* (*character*) para números, tendo em vista a necessidade para exploração descritiva e construção de modelos. A variável *Type* é o *label* (rótulo) de nossas classes de vidro, e essas deverão passar a ser fatores, sendo renomeada para *Tipo*.
-\
+\newline
 A variável *RI* será dividida por $10^5$ para adequação de escala real.
-\
+
 
 </p>
 
@@ -183,11 +185,11 @@ dplyr::glimpse(df)
 <p style="text-align: justify">
 
 Com o ajuste inicial do nosso `df`, foi modificado a classe das variáveis nos objetos  e ajustado os fatores / classes / labels / rótulos dos vidros, sendo estes renomeadas para ${X1,\;X2,\;X3,\;X5, X6\;e\;X7}$, para posterior uso na construção de modelo preditivo.
-\
+\newline
 Agora vamos analisar se há `NA` ou `NaN` nos nossos dados, e, vamos aproveitar para calcular as estatísticas de tendência central e realizar de modo simultâneo um histograma de nossas variáveis de interesse.
-\
+\newline
 Abaixo, utilizaremos as abas `Análise 1` e `Análise 2` para expor nossas informações descritas até aqui. Sendo que a aba `Análise 2`, servirá para nos aprofundarmos na análise descritiva com as variáveis de interesse de acordo com o label.
-\
+\newline
 
 </p>
 
@@ -248,15 +250,15 @@ Abaixo, utilizaremos as abas `Análise 1` e `Análise 2` para expor nossas infor
 <p style="text-align: justify">
 
 Como pode-se perceber não temos `NA` ou `NaN` no nosso `df`. Logo, não temos a necessidade de inputar dados faltantes.
-\
+\newline
 Nossas variáveis não apresentam distribuições claramente semelhantes. Do ponto de vista descritivo, comparando classes numa mesma variável, a classe **X3** apresenta menor valor médio de **RI**, e **X5** e **X6** apresentam os maiores valores. E, de modo inverso, **X5** e **X6** apresentam os menores valores de desvio padrão (DP), e **X3** apresenta o maior valor.
-\
+\newline
 Da variável **Na** os maiores valores de média e DP são referentes a **X6**, e para **X1** e **X3** os valores de média e DP estão próximos. Os valores de DP de **X1** e **X3** para **Mg**, estão muito abaixo que para as outras classes, e os valores de média estão próximos.
-\
+\newline
 **X1** e **X2** apresentam baixos valores de DP em **Al**. Em **K**, **X6** apresenta média e DP iguais a zero, e **X5** apresenta elevado DP. Em **Ca**, as médias de **X1** e **X3** são muito próximas, e ambas as classes tem baixo valor de DP. E, para **Ba** e **Fe**, a média e o DP de **X6** são iguais a zero.
-\
+\newline
 Contudo é interessante frisar a semelhança entre os dados das classes **X1** e **X3**, apresentando uma leve divergência apenas para **RI** e **Ba**.
-\
+\newline
 
 </p>
 
@@ -281,9 +283,9 @@ Contudo é interessante frisar a semelhança entre os dados das classes **X1** e
 <p style="text-align: justify">
 
 Aparentemente não é possível visualizar um padrão claro entre as classes, e através da nossa matriz de dispersão, não conseguimos identificar situação de colinearidade entre as variáveis.
-\
+\newline
 A homogeneidade entre os objetos pode, desde já, nos nortear quanto a dificuldade de construção de modelo preditivo com bons valores de sensibilidade e especificidade. E se focarmos nos grupos **X1** e **X3**, que é este, que desde a estatística básica apresenta homogeneidade, poderemos notar o quão similares os grupos são.
-\
+\newline
 
 </p>
 
@@ -292,7 +294,7 @@ A homogeneidade entre os objetos pode, desde já, nos nortear quanto a dificulda
 <p style="text-align: justify">
 
 Os conjuntos de objetos pertencentes a **X1** e **X3** apresentam comportamento muito semelhante, e, em algum casos, com apresentando comportamento similar a uma situação bimodal, e para essas, realizaremos nosso `ggpairs` de formas separadas, dada as devidas condições anunciadas nas abas, e também utilizaremos o recurso de representação em 3D, a fim de tentar melhorar a perspectiva visual.
-\
+\newline
 
 </p>
 
@@ -440,11 +442,11 @@ Os conjuntos de objetos pertencentes a **X1** e **X3** apresentam comportamento 
 <p style="text-align: justify">
 
 Através da análise visual dos gráficos de dispersão é notável que alguns pontos mais distantes da massa de dados. E, apesar do problema em análise abordar variáveis com baixa incerteza de medição e elucidarem grandezas físico-química, realizaremos análise visual para discriminação de potenciais valores aberrantes (*outliers*).
-\
+\newline
 Tal fato será importante, também, para tentar minimizar o possível *bias* gerado futuramento no modelo preditor, pois, é nítido que as classes (*labels*) estão desbalanceados, como pode ser visualizado abaixo, onde, de `r nrow(df)` objetos, apenas `r paste0(round(length(which(df$Tipo == "X6"))/nrow(df)*100, 2), "%")` representam a classe **X6**.
-\
+\newline
 Contudo, a priori, procederemos com cautela pois **X3** e **X5** também apresentam baixos percentuais de representação no conjunto de objetos em análise, como pode ser visualizado no chunk abaixo. E, no próximo tópico, tentaremos refinar o nosso `df` identificando possíveis *outliers*.
-\
+\newline
 
 </p>
 
@@ -458,9 +460,9 @@ table(df$Tipo)
 <p style="text-align: justify">
 
 Para iniciar o processo de identificação de possíveis *outliers*, criaremos uma coluna de `ID` no nosso `df` para poder facilitar o processo de manipulação de dados. 
-\
+\newline
 Novamente, com o auxílio do gráfico de dispersão, iniciaremos a prospecção dos possíveis objetos enquadrados como *outliers*. E, utilizaremos a ferramenta de gráfico interativo para poder identificar as informações de variáveis e de `ID`.
-\
+\newline
 
 </p>
 
@@ -480,9 +482,9 @@ df_out <- df %>%
 <p style="text-align: justify">
 
 Foi notado que os objetos $107,\;108,\;164,\;173\;e\;175$ estão muito afastados da massa central de dados. Como pode ser evidenciado abaixo. Sendo $107\;e\;108$ pertencentes a classe **X2** e $164,\;173\;e\;175$ a classe **X5**.
-\
+\newline
 A fim de tornar ainda mais evidente a informação, apresentaremos os gráficos de dispersão em maior tamanho e em escala *z-score*.
-\
+\newline
 
 </p>
 
@@ -526,7 +528,7 @@ df_out2 <- df_out %>%
 <p style="text-align: justify">
 
 Contudo, ao plotar os pontos e box-plot em função da variável **Na**, podemos notar que os objetos $173\;e\;175$ não apresentam comportamento incomum ou valor aberrante para o parâmetro, logo, manteremos como *outliers* apenas os objetos $107,\;108\;e\;164$.
-\
+\newline
 
 </p>
 
@@ -535,9 +537,9 @@ Contudo, ao plotar os pontos e box-plot em função da variável **Na**, podemos
 <p style="text-align: justify">
 
 No presente trabalho utilizaremos o algoritmo de *Random Forest*, através do pacote `caret`, para poder proceder com a classificação multiclasse dos vidros. Adotaremos um número padrão de árvores (`ntree = 1500`), e todos os modelos gerados serão "cross-validados" através da técnica *k-fold*, onde $k=10$. Como nesse problema existe desbalanceamento de classes, utilizaremos também técnicas de compensação como *undersampling* e *oversampling*.
-\
+\newline
 Deste modo, utilizando o conjunto de dados sem promover modificações (apenas removendo *outliers*), construiremos 03 modelos de classificação: 
-\
+\newline
 
 * Modelo com dados originais;
 
@@ -545,9 +547,9 @@ Deste modo, utilizando o conjunto de dados sem promover modificações (apenas r
 
 * Modelo com *over*.
 
-\
+\newline
 Logo, para proceder com a construção dos nossos modelos de classificação, manipularemos os dados para removermos os *outliers*, separaremos nosso banco de dados em treino (`train_data`) e teste (`test_data`), na proporção de 70-30%, e criaremos o objeto `control_Cv` para poder proceder com a *cross-validation*.
-\
+\newline
 
 </p>
 
@@ -589,16 +591,16 @@ arvores <- 1500
 
 
 <p style="text-align: justify">
-\
+\newline
 Com o `df` devidamente ajustado, partiremos então para a construção dos modelos:
 
-\
+\newline
 
 ### MODELO RF SEM REAMOSTRAGEM {.tabset .tabset-fade}
 
 * 1. 1) *Random Forest* sem reamostragem (original)
 
-\
+\newline
 </p>
 
 ```{r, message=FALSE, warning=FALSE}
@@ -618,11 +620,11 @@ cm_original_m1
 ### MODELO RF COM OVERSAMPLING {.tabset .tabset-fade}
 
 <p style="text-align: justify">
-\
+\newline
 
 * 1. 2) *Random Forest* com *oversampling*
 
-\
+\newline
 
 </p>
 
@@ -643,11 +645,11 @@ cm_over_m1
 ### MODELO RF COM UNDERSAMPLING {.tabset .tabset-fade}
 
 <p style="text-align: justify">
-\
+\newline
 
 * 1. 3) *Random Forest* com *undersampling*
 
-\
+\newline
 
 </p>
 
@@ -674,11 +676,11 @@ cm_down_m1
 <p style="text-align: justify">
 
 Apesar da robustez do algoritmo de `RF` e dos resultados satisfatórios removendo alguns objetos considerados como aberrantes, é notório que as distribuições de nossas variáveis preditoras **K**, **Mg** e **RI** apresentam elevada assimetria, e isto pode impactar negativamente o desempenho do modelo proposto.
-\
+\newline
 Deste modo, iremos proceder com manutenção dos objetos considerados inicialmente como *outliers* e realizaremos a transformação das variáveis supracitadas através da técnica de transoformação de Yeo–Johnson. Tal fato se dá pela homogeneização da escolha do método de transformação pois algumas de nosss variáveis apresentam valor igual a 0 (zero), logo não poderemos utiliar técnica como transformação Box-Cox para todas as variáveis.
-\
+\newline
 Abaixo, podemos visualizar que as variáveis mencionadas não apresentam visualmente padrão de distribuição normal.
-\
+\newline
 </p>
 
 ```{r, message=FALSE, warning=FALSE}
@@ -707,14 +709,14 @@ shiny::div(plotly::ggplotly(df %>%
 
 <p style="text-align: justify">
 Apesar dos bons valores de Acurácia, a classe **X3** não apresenta bom *score* de Verdaadeiros Positivos, logo, novos modelos serão propostos para cenários similares, tendo em vista o melhor ajuste para o modelo preditor.
-\
+\newline
 </p>
 
 ### Cenário A
 
 <p style="text-align: justify">
 Para construir os novos modelos, precisaremos reajustar nosso `df`.
-\
+\newline
 </p>
 
 ```{r, message=FALSE, warning=FALSE}
@@ -732,11 +734,11 @@ df_pred2 <- df %>%
 
 <p style="text-align: justify">
 Para poder incrementar performance aos modelos propostos criaremos uma relação não linear entre os preditores e a resposta executando a regressão usando transformações dos preditores [(James et al., 2013)](https://www.ime.unicamp.br/~dias/Intoduction%20to%20Statistical%20Learning.pdf#page=160), onde iremos incluir variáveis $X^2$ no nosso modelo.
-\
+\newline
 E, para implementar tal estratéfia, as variáveis **Fe** e **Ca** serão elevadas a potência 2, baseado na análise exploratória e o **feedback** dos modelos construídos no moemnto anterior.
-\
+\newline
 Poderiamos pensar em algo similar para a variável **Ba**, contudo, a explicação para semelhança de medidas de tendência central em **X1** e **X3** para **Ba** se dá pela elevada quantidade de objetos com valor 0 (zero) para esta variável preditora.
-\
+\newline
 </p>
 
 ```{r, message=FALSE, warning=FALSE}
@@ -747,7 +749,7 @@ df_pred2 <- df_pred2 %>%
 
 <p style="text-align: justify">
 Nossos novos modelos propostos terão configuração análoga ao primeiros modelos, com dados "originais", *undersampling* e *oversampling*.
-\
+\newline
 </p>
 
 ```{r, message=FALSE, warning=FALSE}
@@ -761,7 +763,7 @@ Nossos novos modelos propostos terão configuração análoga ao primeiros model
 
 * 2. 1. A) *Random Forest* sem reamostragem (original)
 
-\
+\newline
 </p>
 
 ```{r, message=FALSE, warning=FALSE}
@@ -780,11 +782,11 @@ cm_original_m2aori
 
 
 <p style="text-align: justify">
-\
+\newline
 
 * 2. 2. A) *Random Forest* com *oversampling*
 
-\
+\newline
 
 </p>
 
@@ -803,11 +805,11 @@ cm_over_m2aup
 ```
 
 <p style="text-align: justify">
-\
+\newline
 
 * 2. 3. A) *Random Forest* com *undersampling*
 
-\
+\newline
 
 </p>
 
@@ -830,7 +832,7 @@ cm_down_m2aunder
 
 <p style="text-align: justify">
 De maneira similar ao Cenário A, das "novas" variáveis, manteremos apenas a abordagem considerando as variáveis transformadas atráves do método Yeo-Johnson.
-\
+\newline
 </p>
 
 ```{r, message=FALSE, warning=FALSE}
@@ -851,7 +853,7 @@ df_pred2 <- df %>%
 
 * 2. 1. B) *Random Forest* sem reamostragem (original)
 
-\
+\newline
 </p>
 
 ```{r, message=FALSE, warning=FALSE}
@@ -870,11 +872,11 @@ cm_original_m2bori
 
 
 <p style="text-align: justify">
-\
+\newline
 
 * 2. 2. B) *Random Forest* com *oversampling*
 
-\
+\newline
 
 </p>
 
@@ -893,11 +895,11 @@ cm_over_m2bup
 ```
 
 <p style="text-align: justify">
-\
+\newline
 
 * 2. 3. B) *Random Forest* com *undersampling*
 
-\
+\newline
 
 </p>
 
@@ -919,7 +921,7 @@ cm_down_m2bunder
 
 <p style="text-align: justify">
 De maneira similar ao Cenário A, das "novas" variáveis, manteremos apenas a abordagem considerando as variáveis transformadas como $X^2$.
-\
+\newline
 </p>
 
 
@@ -938,7 +940,7 @@ df_pred2 <- df %>%
 
 * 2. 1. C) *Random Forest* sem reamostragem (original)
 
-\
+\newline
 </p>
 
 ```{r, message=FALSE, warning=FALSE}
@@ -957,11 +959,11 @@ cm_original_m2cori
 
 
 <p style="text-align: justify">
-\
+\newline
 
 * 2. 2. C) *Random Forest* com *oversampling*
 
-\
+\newline
 
 </p>
 
@@ -980,11 +982,11 @@ cm_over_m2cup
 ```
 
 <p style="text-align: justify">
-\
+\newline
 
 * 2. 3. C) *Random Forest* com *undersampling*
 
-\
+\newline
 
 </p>
 
@@ -1008,7 +1010,7 @@ cm_down_m2cunder
 
 <p style="text-align: justify">
 
-\
+\newline
 
 </p>
 
@@ -1133,11 +1135,11 @@ shiny::div(plotly::ggplotly(plotx),
 
 
 <p style="text-align: justify">
-\
+\newline
 Analisando o gráfico acima, podemos observar que os modelo com dados *oversampling* com o conjunto de dados sem transformação ou incremento de vriáveis apresentou melhor *socore* de Acurácia e *Kappa* ao que os outros modelos.  
-\
+\newline
 Outra análise que pode ser feita, para a comparação dos modelos, é a análise da curva ROC, na qual temos plotados valores de **Sensitividade** e **Especificidade**, para diversos *thresholds*.
-\
+\newline
 </p>
 
 ```{r, message=FALSE, warning=FALSE}
@@ -1242,19 +1244,17 @@ shiny::div(plotly::ggplotly(plot_oob), align = "center")
 ```
 
 <p style="text-align: justify">
-\
+\newline
 Para a construção da curva ROC, são construídos, inicialmente, modelos binomiais de uma determinada classe vs todas as outras, ex:
-\
-\
+\newline
 Modelo 1: X1 vs c(X2,X3,X5,X6,X7)
-\
-\
+\newline
 Assim, são calculados os valores de **Sensitividade** e **Especificidade** para diversos *thresholds*. Com todas as classes plotadas, é feita uma curva que é o valor médio de todas as outras em um determinado intervalo de confiança: **Macro** e **Micro** indicados no plot e com maior opacidade.
-\
+\newline
 **Marcello**
-\
+\newline
 **AUC - qual modelo?**
-\
+\newline
 </p>
 
 
@@ -1265,15 +1265,15 @@ Assim, são calculados os valores de **Sensitividade** e **Especificidade** para
 <p style="text-align: justify">
 
 aa...
-\
+\newline
 Como sugestão para trabalhos futuros, indicamos a aplicação de técnica de modelos de misturas tendo em vista as possíveis sub-populações de distribuição. Sugerimos também a construção de modelos de super learning. 
-\
+\newline
 </p>
 
 
 ***
 
-\
+\newline
 
 **Discentes:**
 \
