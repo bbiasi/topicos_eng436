@@ -40,14 +40,14 @@ knitr::opts_chunk$set(echo = TRUE,
 
 
 ```{r pressure, echo=FALSE, fig.cap="A caption", out.width = '100%', fig.cap=''}
+# informe!!!
+# caso desejado executar o script, e necessario haver internet disponivel tendo
+# em vista o download da imagem abaixo!
+
 cover_url = 'https://i.imgur.com/xVOrqDf.png'
 if (!file.exists(cover_file <- 'cover.jpg'))
   download.file(cover_url, cover_file, mode = 'wb')
 knitr::include_graphics(if (identical(knitr:::pandoc_to(), 'html')) cover_url else cover_file)
-
-# informe!!!
-# caso desejado executar o script, e necessario haver internet disponivel tendo
-# em vista o download da imagem acima.
 ```
 
 ## APRESENTAÇÃO
