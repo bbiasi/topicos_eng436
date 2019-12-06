@@ -239,7 +239,7 @@ plotx1 <- df %>%
   ylab("z-score") +
   theme_bw()  +
   tema
-plotx8 <- cowplot::plot_grid(plotx, plotx1, align = "hv", axis = "bt")
+plotx8 <- cowplot::plot_grid(plotx, plotx1, align = "hv", axis = "bt", labels = c("(A)", "(B)"))
 
 ggsave(file = "plotx8.png", plotx8, width  = 13, height = 9, dpi = 700)
 plotx8
@@ -248,6 +248,9 @@ plotx8
 ### Análise 1.2
 
 ```{r, message=FALSE, warning=FALSE, fig.align='center'}
+# df %>% 
+#   dplyr::filter(Tipo == "X6") %>% 
+#   dplyr::select(Fe, Ba)
 df %>%
   dplyr::group_by(Tipo) %>%
   skimr::skim() %>%
@@ -387,7 +390,7 @@ plot_b1 <- df %>%
   tema +
   theme(legend.position = "bottom")
 plotb <- cowplot::plot_grid(plot_b, plot_b1, align = "hv")
-ggsave(file = "plotb.png", plotb, width  = 13, height = 9, dpi = 700)
+ggsave(file = "plotb.png", plotb, width  = 11, height = 7, dpi = 700)
 plotb
 ```
 
