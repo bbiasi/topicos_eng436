@@ -64,7 +64,7 @@ knitr::include_graphics(if (identical(knitr:::pandoc_to(), 'html')) cover_url el
 \
 **ENG436 - Tópicos Especiais em Engenharia**
 \
-
+ 
 \
 O presente trabalho foi desenvolvido como parte de avaliação para a disciplina Tópicos Especiais em Engenharia, ministrada pela docente Karla Esquerre da Escola Politécnica da UFBA.
 \
