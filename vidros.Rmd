@@ -44,6 +44,10 @@ cover_url = 'https://i.imgur.com/xVOrqDf.png'
 if (!file.exists(cover_file <- 'cover.jpg'))
   download.file(cover_url, cover_file, mode = 'wb')
 knitr::include_graphics(if (identical(knitr:::pandoc_to(), 'html')) cover_url else cover_file)
+
+# informe!!!
+# caso desejado executar o script, e necessario haver internet disponivel tendo
+# em vista o download da imagem acima.
 ```
 
 ## APRESENTAÇÃO
@@ -63,6 +67,8 @@ knitr::include_graphics(if (identical(knitr:::pandoc_to(), 'html')) cover_url el
 
 \
 O presente trabalho foi desenvolvido como parte de avaliação para a disciplina Tópicos Especiais em Engenharia, ministrada pela docente Karla Esquerre da Escola Politécnica da UFBA.
+\
+O código completo deste arquivo .Rmd pode ser acessado através deste [**link**](•	https://github.com/bbiasi/topicos_eng436).
 \
 
 </p>
@@ -131,7 +137,7 @@ Abaixo, iniciamos o código indicando o caminho da pasta de trabalho, carregando
 
 
 ```{r message=FALSE, warning=FALSE}
-setwd("D:/PEI/Doc/Disciplinas/Topicos/topicos_eng436")
+# setwd("D:/PEI/Doc/Disciplinas/Topicos/topicos_eng436")
 # setwd("C:/Users/MARCELLO/Desktop/ENG436/topicos_eng436")
 
 {
@@ -1201,10 +1207,33 @@ shiny::div(plotly::ggplotly(plot_x1),
 
 <p style="text-align: justify">
 \
-Analisando o gráfico acima, podemos observar que os modelo com dados *oversampling* com o conjunto de dados sem transformação ou incremento de vriáveis apresentou melhor *socore* de Acurácia e *Kappa* ao que os outros modelos.  
+Construído os modelos, foram plotados em gráficos as métricas dos doze modelos, para a comparação e seleção do de maior performance.
 \
-Outra análise que pode ser feita, para a comparação dos modelos, é a análise da curva ROC, na qual temos plotados valores de **Sensitividade** e **Especificidade**, para diversos *thresholds*.
+Analisando o gráfico da Figura 4, é perceptível que entre os doze modelos, quatro tiveram destaque nas métricas indicadas: original do cenário 2A, original do cenário 2B, o oversampling incial e o oversampling do cenário 2B. Sendo assim, a partir dessa análise visual, podemos selecionar apenas os quatro modelos de melhor performance para proceder com a análise. Podemos então projetar os quatro modelos selecionados entre os doze, para melhor avaliação.
 \
+Visualmente, é perceptível que, entre os quatro modelos, dois se destacaram: o oversampling inicial e o original de cenário 2B, possuindo valores de acurácia e Kappa bastante próximos.
+Logo, não é trivial selecionar o modelo de melhor performance avaliando essas duas métricas. 
+\
+A fim de propor apenas um modelo preditivo, foi gerado o gráfico da Figura 6, onde a luz da exposição das métricas de sensibilidade, especificidade e F-Score, por classe, para os dois modelos, é possível ter mais propriedade acerca dos modelos construídos. 
+\
+Os modelos obtiveram o mesmo desempenho para as três métricas nas classes X5, X6 e X7. Contudo, na classe X3, o modelo de oversampling inicial obteve maiores valores de sensibilidade, especificidade e F-Score. 
+\
+Considerando que a classe X3, no geral, apresentou dificuldade em ser predita corretamente (verdadeiro positivo), o modelo escolhido para o de maior performance foi o de oversampling inicial, já que para as classes X1 e X2, temos um trade-off entre os modelos. 
+\
+Tal situação contempla a perspectiva inicial de difícil segregação das classes X1 e X3, como constatado na análise exploratória. É notório, também, que a abordagem com múltiplos cenários possibilita melhor compreensão sobre desempenho dos modelos para determinadas situações.
+Sendo assim, feita toda a análise de métricas, o modelo de melhor performance foi o de reamostragem utilizando a técnica de oversampling, sem nenhuma potencialização ou transformação de variáveis, Cenário 1, com matriz de confusão do teste.
+\
+É notável o elevado número de acertos das classes X1 e X2, quando comparada as outras, justamente devido ao desbalanceamento de classes. Fica perceptível também, a dificuldade em acertar a classe X3, por ser facilmente confundida com a X1. As classes X5, X6 e X7 possuíram elevada taxa de acerto (100% para as X5 e X6). 
+\
+Procurando otimizar o modelo preditivo escolhido, buscou-se reduzir o número de árvores da *Random Forest* com o objetivo pontual de reduzir o custo computacional.
+\
+É perceptível que o erro do OOB se torna estável na média a partir da 500ª árvore de decisão, apesar de certa instabilidade das classes X1 e X2, representando que não há muito ganho para o modelo a partir daí. 
+\
+Sendo assim, foi modificado o número de árvores para 750 (representando metade do valor inicial), valor esse escolhido arbitrariamente com o objetivo de reduzir o custo computacional e não interferir negativamente no resultado, e o tempo de processamento para construção do modelo reduziu em 50%. 
+\
+Comparando os resultados com a bibliografia consultada, mais precisamente o modelo construído por Aldayel (2012), o qual obteve uma acurácia de 80,37% através de um algoritmo que combinou a decisão de dois classificadores, técnica ensemble, K-Nearest Neighbor (KNN) e Hidden Naive Bayes (HNB), o modelo construído no presente trabalho, a partir do algoritmo de Random Forest e sua posterior otimização, demonstra resultado semelhante, sendo tão potente quanto o de dois classificadores.
+\
+
 </p>
 
 ```{r, message=FALSE, warning=FALSE}
@@ -1246,11 +1275,15 @@ shiny::div(plotly::ggplotly(plot_oob), align = "center")
 
 <p style="text-align: justify">
 \
-Para a construção da curva ROC, são construídos, inicialmente, modelos binomiais de uma determinada classe vs todas as outras, ex:
+No presente trabalho fora proposto um modelo preditivo de classificação de vidro multiclasse, utilizando do algoritmo de Random Forest para diferentes cenários e situações de treinamento, dado a condição de desbalanceamento de classes de vidro, para suporte da análise forense. 
+O algoritmo mostrou-se eficiente visto que o resultado final compôs um valor de acurácia de 80,33%, ou seja, 49 de 61 observações, superior ao modelo original. 
 \
-Modelo 1: X1 vs c(X2,X3,X5,X6,X7)
+Como indicado por Breiman (2001), o algoritmo de Random Forest é robusto para ruídos e problemas não-lineares, e apesar da remoção de alguns objetos com valores aberrantes porém no cenário inicial proposto, sem transformação ou adição de variáveis incrementadoras de performance, o algoritmo apresentou melhor resultado. 
 \
-Assim, são calculados os valores de **Sensitividade** e **Especificidade** para diversos *thresholds*. Com todas as classes plotadas, é feita uma curva que é o valor médio de todas as outras em um determinado intervalo de confiança: **Macro** e **Micro** indicados no plot e com maior opacidade.
+Vale a pena ressaltar, também, a importância das técnicas de reamostragem para construção de modelos preditivos em condições de desbalanceamento de classes, haja visto que o modelo proposto no presente artigo foi concebido utilizando a técnica de oversampling.
+\
+Como sugestão para trabalhos futuros, indicamos a aplicação de técnica de modelos de misturas, tendo em vista as possíveis sub-populações de distribuição dos atributos. Sugerimos também tentativa de técnicas mais robustas para detecção de outliers, como a PCA (Análise de Componentes Principais), e, para a construção de modelo com maior acurácia, a tentativa de emprego de método de super learning poderá proporcionar melhor performance.
+aior opacidade.
 \
 </p>
 
