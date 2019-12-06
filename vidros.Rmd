@@ -91,7 +91,7 @@ Diferentes estudos utilizam algoritmos de aprendizado de máquina para tarefas d
 
 <p style="text-align: justify">
 
-O presente *dataset* em análise é um conjunto de objetos de identificação de vidro da UC Irvine Machine Learning Repository, disponível no [Kaggle](https://www.kaggle.com/uciml/glass), contendo 10 atributos, sendo a resposta o tipo do vidro (*label* / rótulo). 
+O presente [*dataset*](https://github.com/bbiasi/topicos_eng436/blob/master/glass.xlsx) em análise é um conjunto de objetos de identificação de vidro da UC Irvine Machine Learning Repository, disponível no [Kaggle](https://www.kaggle.com/uciml/glass), contendo 10 atributos, sendo a resposta o tipo do vidro (*label* / rótulo). 
 \
 Os atributos em análise são:
 \
