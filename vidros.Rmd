@@ -197,51 +197,55 @@ Abaixo, utilizaremos as abas `Análise 1` e `Análise 2` para expor nossas infor
 ### Análise 1.1 
 
 ```{r, message=FALSE, warning=FALSE, fig.align='center'}
-# df %>% 
-#   dplyr::select(-c("Tipo")) %>% 
-#   skimr::skim() %>% 
-#   dplyr::rename("Tipo da Variável" = skim_type, "Variável" = skim_variable, "nº NA" = n_missing, 
-#                 "Média"  = numeric.mean, "DP" = numeric.sd,
-#                 "p0" = numeric.p0, "p25" = numeric.p25, "p50" =	numeric.p50,
-#                 "p75" = numeric.p75,"p100" = numeric.p100,
-#                 "Histograma" =	numeric.hist) %>% 
-#   dplyr::select(-c("complete_rate")) %>% 
-#   knitr::kable()
+df %>%
+  dplyr::select(-c("Tipo")) %>%
+  skimr::skim() %>%
+  dplyr::rename("Tipo da Variável" = skim_type, "Variável" = skim_variable, "nº NA" = n_missing,
+                "Média"  = numeric.mean, "DP" = numeric.sd,
+                "p0" = numeric.p0, "p25" = numeric.p25, "p50" =	numeric.p50,
+                "p75" = numeric.p75,"p100" = numeric.p100,
+                "Histograma" =	numeric.hist) %>%
+  dplyr::select(-c("complete_rate")) %>%
+  knitr::kable()
 
-# plotx <- df %>% 
-#   dplyr::mutate_at(1:9, funs(scale)) %>% 
-#   tidyr::gather("Var", "Valor",-Tipo) %>% 
-#   ggplot2::ggplot() +
-#   geom_jitter(aes(x = Var, y = Valor, col = Tipo), alpha = 0.6, width = 0.15) +
-#   xlab("Variáveis") +
-#   ylab("z-score") +
-#   theme_bw() +
-#   theme(legend.position = "bottom")
-# plotx1 <- df %>% 
-#   dplyr::mutate_at(1:9, funs(scale)) %>% 
-#   tidyr::gather("Var", "Valor",-Tipo) %>% 
-#   ggplot2::ggplot() +
-#   geom_boxplot(aes(x = Var, y = Valor),
-#                alpha = 0.9, show.legend = F, width = 0.4) +
-#   xlab("Variáveis") +
-#   ylab("z-score") +
-#   theme_bw()
-# cowplot::plot_grid(plotx, plotx1, align = "hv", axis = "bt")
+plotx <- df %>%
+  dplyr::mutate_at(1:9, funs(scale)) %>%
+  tidyr::gather("Var", "Valor",-Tipo) %>%
+  ggplot2::ggplot() +
+  geom_jitter(aes(x = Var, y = Valor, col = Tipo), alpha = 0.6, width = 0.15) +
+  xlab("Variáveis") +
+  ylab("z-score") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+plotx1 <- df %>%
+  dplyr::mutate_at(1:9, funs(scale)) %>%
+  tidyr::gather("Var", "Valor",-Tipo) %>%
+  ggplot2::ggplot() +
+  geom_boxplot(aes(x = Var, y = Valor),
+               alpha = 0.9, show.legend = F, width = 0.4) +
+  xlab("Variáveis") +
+  ylab("z-score") +
+  theme_bw()
+plotx8 <- cowplot::plot_grid(plotx, plotx1, align = "hv", axis = "bt")
+
+ggsave(file = "plotx8.png", plotx8, width  = 13, height = 9, dpi = 700)
+plotx8
 ```
 
 ### Análise 1.2
 
 ```{r, message=FALSE, warning=FALSE, fig.align='center'}
-# df %>% 
-#   dplyr::group_by(Tipo) %>% 
-#   skimr::skim() %>% 
-#   dplyr::rename("Variável" = skim_variable, "Classe" = Tipo, 
-#                 "Média"  = numeric.mean, "DP" = numeric.sd,
-#                 "p0" = numeric.p0, "p25" = numeric.p25, "p50" =	numeric.p50,
-#                 "p75" = numeric.p75,"p100" = numeric.p100,
-#                 "Histograma" =	numeric.hist) %>% 
-#   dplyr::select(-c("skim_type", "complete_rate", "n_missing")) %>% 
-#   knitr::kable()
+df %>%
+  dplyr::group_by(Tipo) %>%
+  skimr::skim() %>%
+  dplyr::rename("Variável" = skim_variable, "Classe" = Tipo,
+                "Média"  = numeric.mean, "DP" = numeric.sd,
+                "p0" = numeric.p0, "p25" = numeric.p25, "p50" =	numeric.p50,
+                "p75" = numeric.p75,"p100" = numeric.p100,
+                "Histograma" =	numeric.hist) %>%
+  dplyr::select(-c("skim_type", "complete_rate", "n_missing")) %>%
+  knitr::kable()
 ```
 
 ##
@@ -265,13 +269,13 @@ Contudo é interessante frisar a semelhança entre os dados das classes **X1** e
 
 
 ```{r, message=FALSE, warning=FALSE, fig.align='center'}
-# plotx <- df %>% 
-#   GGally::ggpairs(columns = 1:9, 
-#                   mapping = aes(color = Tipo, alpha = 0.5),
-#                   upper = list(continuous = wrap("cor", size = 2)),
-#                   lower = list(continuous = wrap("points", alpha = 0.3)))
-# shiny::div(plotly::ggplotly(plotx), align = "center")
-# 
+plotx <- df %>%
+  GGally::ggpairs(columns = 1:9,
+                  mapping = aes(color = Tipo, alpha = 0.5),
+                  upper = list(continuous = wrap("cor", size = 2)),
+                  lower = list(continuous = wrap("points", alpha = 0.3)))
+shiny::div(plotly::ggplotly(plotx), align = "center")
+
 plotx <- df %>%
   dplyr::filter(Tipo %in% c("X1", "X3")) %>%
   GGally::ggpairs(columns = 1:9,
@@ -302,138 +306,140 @@ Os conjuntos de objetos pertencentes a **X1** e **X3** apresentam comportamento 
 #### RI > 1 
 
 ```{r, message=FALSE, warning=FALSE, fig.align='center'}
-# plotx <- df %>% 
-#   dplyr::filter(Tipo %in% c("X1", "X3"),
-#                 RI > 1) %>% 
-#   GGally::ggpairs(columns = 1:9, 
-#                   mapping = aes(color = Tipo, alpha = 0.5),
-#                   upper = list(continuous = wrap("cor", size = 2.5)),
-#                   lower = list(continuous = wrap("points", alpha = 0.3)))
-# shiny::div(plotly::ggplotly(plotx), align = "center")
+plotx <- df %>%
+  dplyr::filter(Tipo %in% c("X1", "X3"),
+                RI > 1) %>%
+  GGally::ggpairs(columns = 1:9,
+                  mapping = aes(color = Tipo, alpha = 0.5),
+                  upper = list(continuous = wrap("cor", size = 2.5)),
+                  lower = list(continuous = wrap("points", alpha = 0.3)))
+shiny::div(plotly::ggplotly(plotx), align = "center")
 ```
 
 #### RI < 1
 
 ```{r, message=FALSE, warning=FALSE, fig.align='center'}
-# plotx <- df %>% 
-#   dplyr::filter(Tipo %in% c("X1", "X3"),
-#                 RI < 1) %>% 
-#   GGally::ggpairs(columns = 1:9, 
-#                   mapping = aes(color = Tipo, alpha = 0.5),
-#                   upper = list(continuous = wrap("cor", size = 2.5)),
-#                   lower = list(continuous = wrap("points", alpha = 0.3)))
-# shiny::div(plotly::ggplotly(plotx), align = "center")
+plotx <- df %>%
+  dplyr::filter(Tipo %in% c("X1", "X3"),
+                RI < 1) %>%
+  GGally::ggpairs(columns = 1:9,
+                  mapping = aes(color = Tipo, alpha = 0.5),
+                  upper = list(continuous = wrap("cor", size = 2.5)),
+                  lower = list(continuous = wrap("points", alpha = 0.3)))
+shiny::div(plotly::ggplotly(plotx), align = "center")
 ```
 
 #### K > 0.4
 
 ```{r, message=FALSE, warning=FALSE, fig.align='center'}
-# plotx <- df %>% 
-#   dplyr::filter(Tipo %in% c("X1", "X3"),
-#                 K > 0.4) %>% 
-#   GGally::ggpairs(columns = 1:9, 
-#                   mapping = aes(color = Tipo, alpha = 0.5),
-#                   upper = list(continuous = wrap("cor", size = 2.5)),
-#                   lower = list(continuous = wrap("points", alpha = 0.3)))
-# shiny::div(plotly::ggplotly(plotx), align = "center")
+plotx <- df %>%
+  dplyr::filter(Tipo %in% c("X1", "X3"),
+                K > 0.4) %>%
+  GGally::ggpairs(columns = 1:9,
+                  mapping = aes(color = Tipo, alpha = 0.5),
+                  upper = list(continuous = wrap("cor", size = 2.5)),
+                  lower = list(continuous = wrap("points", alpha = 0.3)))
+shiny::div(plotly::ggplotly(plotx), align = "center")
 ```
 
 #### K < 0.4
 
 ```{r, message=FALSE, warning=FALSE, fig.align='center'}
-# plotx <- df %>% 
-#   dplyr::filter(Tipo %in% c("X1", "X3"),
-#                 K < 0.4) %>% 
-#   GGally::ggpairs(columns = 1:9, 
-#                   mapping = aes(color = Tipo, alpha = 0.5),
-#                   upper = list(continuous = wrap("cor", size = 2.5)),
-#                   lower = list(continuous = wrap("points", alpha = 0.3)))
-# shiny::div(plotly::ggplotly(plotx), align = "center")
+plotx <- df %>%
+  dplyr::filter(Tipo %in% c("X1", "X3"),
+                K < 0.4) %>%
+  GGally::ggpairs(columns = 1:9,
+                  mapping = aes(color = Tipo, alpha = 0.5),
+                  upper = list(continuous = wrap("cor", size = 2.5)),
+                  lower = list(continuous = wrap("points", alpha = 0.3)))
+shiny::div(plotly::ggplotly(plotx), align = "center")
 ```
 
 #### 3D
 
 ```{r, message=FALSE, warning=FALSE, fig.align='center'}
-# plot1 <- df %>% 
-#   dplyr::filter(Tipo %in% c("X1", "X3")) %>% 
-#   ggplot(aes(x = Fe, y = RI, z = K, 
-#              color = Tipo)) + 
-#   theme_void() +
-#   theme(plot.background = element_rect(color = "black")) +
-#   axes_3D(theta = 0) +
-#   stat_3D(theta = 0)
-#   
-# plot2 <- df %>% 
-#   dplyr::filter(Tipo %in% c("X1", "X3")) %>% 
-#   ggplot(aes(x = Fe, y = RI, z = K, 
-#              color = Tipo)) + 
-#   theme_void() +
-#   theme(plot.background = element_rect(color = "black")) +
-#   axes_3D(theta = 90) +
-#   stat_3D(theta = 90)
-# 
-# plot3 <- df %>% 
-#   dplyr::filter(Tipo %in% c("X1", "X3")) %>% 
-#   ggplot(aes(x = Fe, y = RI, z = K, 
-#              color = Tipo)) + 
-#   theme_void() +
-#   theme(plot.background = element_rect(color = "black")) +
-#   axes_3D(theta = 180) +
-#   stat_3D(theta = 180)
-# 
-# plot4 <- df %>% 
-#   dplyr::filter(Tipo %in% c("X1", "X3")) %>% 
-#   ggplot(aes(x = Fe, y = RI, z = K, 
-#              color = Tipo)) + 
-#   theme_void() +
-#   theme(plot.background = element_rect(color = "black")) +
-#   axes_3D(theta = 270) +
-#   stat_3D(theta = 270)
-# 
-# cowplot::plot_grid(plot1, plot2, plot3, plot4, align = "hv",
-#                    labels = c('0°', '90°', '180°', '270°'))
-# ```
-# 
+plot1 <- df %>%
+  dplyr::filter(Tipo %in% c("X1", "X3")) %>%
+  ggplot(aes(x = Fe, y = RI, z = K,
+             color = Tipo)) +
+  theme_void() +
+  theme(plot.background = element_rect(color = "black")) +
+  axes_3D(theta = 0) +
+  stat_3D(theta = 0)
+
+plot2 <- df %>%
+  dplyr::filter(Tipo %in% c("X1", "X3")) %>%
+  ggplot(aes(x = Fe, y = RI, z = K,
+             color = Tipo)) +
+  theme_void() +
+  theme(plot.background = element_rect(color = "black")) +
+  axes_3D(theta = 90) +
+  stat_3D(theta = 90)
+
+plot3 <- df %>%
+  dplyr::filter(Tipo %in% c("X1", "X3")) %>%
+  ggplot(aes(x = Fe, y = RI, z = K,
+             color = Tipo)) +
+  theme_void() +
+  theme(plot.background = element_rect(color = "black")) +
+  axes_3D(theta = 180) +
+  stat_3D(theta = 180)
+
+plot4 <- df %>%
+  dplyr::filter(Tipo %in% c("X1", "X3")) %>%
+  ggplot(aes(x = Fe, y = RI, z = K,
+             color = Tipo)) +
+  theme_void() +
+  theme(plot.background = element_rect(color = "black")) +
+  axes_3D(theta = 270) +
+  stat_3D(theta = 270)
+
+plotx7 <- cowplot::plot_grid(plot1, plot2, plot3, plot4, align = "hv",
+                   labels = c('0°', '90°', '180°', '270°'))
+ggsave(file = "plotx7.png", plotx7, width  = 13, height = 9, dpi = 700)
+plotx7
+```
+
 # #### 3D interactive
-# 
-# ```{r, message=FALSE, warning=FALSE, cache = TRUE, fig.align='center'}
-# cores <- c("royalblue1", "darkcyan", "green1", "black", "goldenrod3", "red2")
-# 
-# df %>% 
-#   plotly::plot_ly(x = ~RI, y = ~Ca, z = ~Fe, color = ~Tipo, 
-#                 colors = cores, opacity = 0.4, stroke = "black") %>%
-#   add_markers() %>%
-#   layout(scene = list(xaxis = list(title = 'RI'),
-#                       yaxis = list(title = 'Ca'),
-#                       zaxis = list(title = 'Fe')))
-# df %>% 
-#   plotly::plot_ly(x = ~Al, y = ~Mg, z = ~Fe, color = ~Tipo, 
-#                 colors = cores, opacity = 0.4, stroke = "black") %>%
-#   add_markers() %>%
-#   layout(scene = list(xaxis = list(title = 'Al'),
-#                       yaxis = list(title = 'Mg'),
-#                       zaxis = list(title = 'Fe')))
+
+```{r, message=FALSE, warning=FALSE, cache = TRUE, fig.align='center'}
+cores <- c("royalblue1", "darkcyan", "green1", "black", "goldenrod3", "red2")
+
+df %>%
+  plotly::plot_ly(x = ~RI, y = ~Ca, z = ~Fe, color = ~Tipo,
+                colors = cores, opacity = 0.4, stroke = "black") %>%
+  add_markers() %>%
+  layout(scene = list(xaxis = list(title = 'RI'),
+                      yaxis = list(title = 'Ca'),
+                      zaxis = list(title = 'Fe')))
+df %>%
+  plotly::plot_ly(x = ~Al, y = ~Mg, z = ~Fe, color = ~Tipo,
+                colors = cores, opacity = 0.4, stroke = "black") %>%
+  add_markers() %>%
+  layout(scene = list(xaxis = list(title = 'Al'),
+                      yaxis = list(title = 'Mg'),
+                      zaxis = list(title = 'Fe')))
 ```
 
 #### 3D interactive para X1 e X3
 
 ```{r, message=FALSE, warning=FALSE, cache = TRUE, fig.align='center'}
-# df %>%
-#   dplyr::filter(Tipo %in% c("X1", "X3")) %>%
-#   plotly::plot_ly(x = ~RI, y = ~Ca, z = ~Fe, color = ~Tipo, 
-#                 colors = cores, opacity = 0.4, stroke = "black") %>%
-#   add_markers() %>%
-#   layout(scene = list(xaxis = list(title = 'RI'),
-#                       yaxis = list(title = 'Ca'),
-#                       zaxis = list(title = 'Fe')))
-# df %>% 
-#   dplyr::filter(Tipo %in% c("X1", "X3")) %>%
-#   plotly::plot_ly(x = ~Al, y = ~Mg, z = ~Fe, color = ~Tipo, 
-#                 colors = cores, opacity = 0.4, stroke = "black") %>%
-#   add_markers() %>%
-#   layout(scene = list(xaxis = list(title = 'Al'),
-#                       yaxis = list(title = 'Mg'),
-#                       zaxis = list(title = 'Fe')))
+df %>%
+  dplyr::filter(Tipo %in% c("X1", "X3")) %>%
+  plotly::plot_ly(x = ~RI, y = ~Ca, z = ~Fe, color = ~Tipo,
+                colors = cores, opacity = 0.4, stroke = "black") %>%
+  add_markers() %>%
+  layout(scene = list(xaxis = list(title = 'RI'),
+                      yaxis = list(title = 'Ca'),
+                      zaxis = list(title = 'Fe')))
+df %>%
+  dplyr::filter(Tipo %in% c("X1", "X3")) %>%
+  plotly::plot_ly(x = ~Al, y = ~Mg, z = ~Fe, color = ~Tipo,
+                colors = cores, opacity = 0.4, stroke = "black") %>%
+  add_markers() %>%
+  layout(scene = list(xaxis = list(title = 'Al'),
+                      yaxis = list(title = 'Mg'),
+                      zaxis = list(title = 'Fe')))
 ```
 
 ###
@@ -472,12 +478,15 @@ Novamente, com o auxílio do gráfico de dispersão, iniciaremos a prospecção 
 df_out <- df %>% 
   tibble::rowid_to_column()
 
-# plotx <- df_out %>% 
-#   GGally::ggpairs(columns = 2:10, 
-#                   mapping = aes(color = Tipo, alpha = 0.5, ),
-#                   upper = list(continuous = wrap("cor", size = 2.5)),
-#                   lower = list(continuous = wrap("points", alpha = 0.3)))
-# shiny::div(plotly::ggplotly(plotx), align = "center")
+plotx6 <- df_out %>%
+  GGally::ggpairs(columns = 2:10,
+                  mapping = aes(color = Tipo, alpha = 0.5, ),
+                  upper = list(continuous = wrap("cor", size = 2.5)),
+                  lower = list(continuous = wrap("points", alpha = 0.3)))
+
+ggsave(file = "plotx6.png", plotx6, width  = 13, height = 9, dpi = 700)
+shiny::div(plotly::ggplotly(plotx6),
+           align = "center")
 ```
 
 <p style="text-align: justify">
@@ -497,33 +506,41 @@ df_out2 <- df_out %>%
   dplyr::mutate_at(vars(2:10), funs(scale)) %>% # scale()
   tidyr::gather(key = "Variaveis", value = "valor", 2:10)
 
-# plotx <- df_out2 %>% 
-#   dplyr::mutate(rowid = as.numeric(as.character(rowid))) %>% 
-#   ggplot2::ggplot() +
-#   ggplot2::geom_jitter(aes(x = Variaveis, y = valor, fill = Out, 
-#                           shape = Out), 
-#                        alpha = 0.5, size = 3,
-#                        show.legend = F) +
-#   facet_wrap(~Tipo, scales = "free") +
-#   scale_shape_manual(values = c(20, 21))
-# shiny::div(plotly::ggplotly(plotx), align = "center")
-# 
-# plotx <- df_out2 %>% 
-#   dplyr::filter(Variaveis == "Na") %>% 
-#   ggplot2::ggplot() +
-#   stat_boxplot(aes(x = Tipo, y = valor),
-#                geom = "errorbar", width = 0.5) +
-#   geom_boxplot(aes(x = Tipo, y = valor),
-#                color = "black", show.legend = F, outlier.shape = NA) +
-#   geom_point(aes(x = Tipo, y = valor,
-#                  shape = Out, fill = Out, alpha = Out), 
-#              size = 5, width = 0.2, show.legend = F,
-#              position = position_jitter(w = 0.1, h = 0)) +
-#   scale_shape_manual(values = c(24, 21)) +
-#   scale_alpha_manual(values = c(0.2, 0.7)) +
-#   scale_y_continuous(limits = c(min(df_out2$valor), max(df_out2$valor))) +
-#   xlab(label = "Tipo")
-# shiny::div(plotly::ggplotly(plotx), align = "center")
+plotx5 <- df_out2 %>%
+  dplyr::mutate(rowid = as.numeric(as.character(rowid))) %>%
+  ggplot2::ggplot() +
+  ggplot2::geom_jitter(aes(x = Variaveis, y = valor, fill = Out,
+                          shape = Out),
+                       alpha = 0.5, size = 3,
+                       show.legend = F) +
+  facet_wrap(~Tipo, scales = "free") +
+  scale_shape_manual(values = c(20, 21)) +
+  theme_bw()
+
+ggsave(file = "plotx5.png", plotx5, width  = 13, height = 9, dpi = 700)
+shiny::div(plotly::ggplotly(plotx5),
+           align = "center")
+
+plotx4 <- df_out2 %>%
+  dplyr::filter(Variaveis == "Na") %>%
+  ggplot2::ggplot() +
+  stat_boxplot(aes(x = Tipo, y = valor),
+               geom = "errorbar", width = 0.5) +
+  geom_boxplot(aes(x = Tipo, y = valor),
+               color = "black", show.legend = F, outlier.shape = NA) +
+  geom_point(aes(x = Tipo, y = valor,
+                 shape = Out, fill = Out, alpha = Out),
+             size = 5, width = 0.2, show.legend = F,
+             position = position_jitter(w = 0.1, h = 0)) +
+  scale_shape_manual(values = c(24, 21)) +
+  scale_alpha_manual(values = c(0.2, 0.7)) +
+  scale_y_continuous(limits = c(min(df_out2$valor), max(df_out2$valor))) +
+  xlab(label = "Tipo") +
+  theme_bw()
+
+ggsave(file = "plotx4.png", plotx4, width  = 13, height = 9, dpi = 700)
+shiny::div(plotly::ggplotly(plotx4),
+           align = "center")
 ```
 
 <p style="text-align: justify">
@@ -1069,20 +1086,22 @@ comparacao <- comparacao %>%
                              cm_down_m2cunder$overall[2]
                              )) %>%
   reshape2::melt(id.vars = c("Modelo"))
-
 levels(comparacao$variable) <- c("Kappa", "Acurácia")
 
-shiny::div(plotly::ggplotly(ggplot2::ggplot(comparacao,
-                                            (aes(x = variable,
-                                                 y = value,
-                                                 color = Modelo))) +
-                              geom_jitter(width = 0.2, alpha = 0.5, size = 3) +
-                              scale_y_continuous(limits = c(0, 1)) +
-                              labs(title = "Classificação Vidro",
-                                   x = "Índice",
-                                   y = "Score",
-                                   color = "Legenda") +
-                              theme_bw()),
+plot_x3 <- ggplot(comparacao,
+                  (aes(x = variable,
+                       y = value,
+                       color = Modelo))) +
+  geom_jitter(width = 0.2, alpha = 0.5, size = 3) +
+  scale_y_continuous(limits = c(0, 1)) +
+  labs(title = "Classificação Vidro",
+       x = "Índice",
+       y = "Score",
+       color = "Legenda") +
+  theme_bw()
+
+ggsave(file = "plot_x3.png", plot_x3, width  = 13, height = 9, dpi = 700)
+shiny::div(plotly::ggplotly(plot_x3),
            align = "center")
 ```
 
@@ -1091,26 +1110,27 @@ shiny::div(plotly::ggplotly(ggplot2::ggplot(comparacao,
 comparacao <- comparacao %>% 
   dplyr::filter(Modelo %in% c("over_inicial", "original_2a", "original_2b", "over_2b"))
 
-shiny::div(plotly::ggplotly(ggplot2::ggplot(comparacao,
-                                            (aes(x = variable,
-                                                 y = value,
-                                                 color = Modelo))) +
-                              geom_jitter(width = 0.2, alpha = 0.5, size = 3) +
-                              labs(title = "Classificação Vidro",
-                                   x = "Índice",
-                                   y = "Score",
-                                   color = "Legenda") +
-                              theme_bw()),
+plot_x2 <- ggplot2::ggplot(comparacao,
+                (aes(x = variable,
+                     y = value,
+                     color = Modelo))) +
+  geom_jitter(width = 0.2, alpha = 0.5, size = 3) +
+  labs(title = "Classificação Vidro",
+       x = "Índice",
+       y = "Score",
+       color = "Legenda") +
+  theme_bw()
+ggsave(file = "plot_x2.png", plot_x2, width  = 13, height = 9, dpi = 700)
+shiny::div(plotly::ggplotly(plot_x2),
            align = "center")
 ```
 
 
 ```{r, message=FALSE, warning=FALSE}
 df1 <- data.frame(cm_over_m1[["byClass"]], modelo = "cm_over_m1")
-
 df3 <- data.frame(cm_original_m2bori[["byClass"]], modelo = "cm_original_m2bori")
 
-plotx <- df1 %>% 
+plot_x1 <- df1 %>% 
   rbind(df3) %>% 
   cbind(classe = rep(paste0(rep('X', 6), setdiff(1:7, 4)), 2)) %>% 
   dplyr::select(1, 2, 7, 12, 13) %>% 
@@ -1127,7 +1147,8 @@ plotx <- df1 %>%
   ylab("Score") +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
-shiny::div(plotly::ggplotly(plotx),
+ggsave(file = "plot_x1.png", plot_x1, width  = 13, height = 9, dpi = 700)
+shiny::div(plotly::ggplotly(plot_x1),
            align = "center")
 ```
 
@@ -1158,6 +1179,7 @@ gini <- varImp(model_rf_up_m1)$importance %>%
   ylab("Variável") +
   theme_bw() + 
   theme(plot.title = element_text(color = "black", size = 22, face = "bold"))
+ggsave(file = "gini.png", gini, width  = 13, height = 9, dpi = 700)
 shiny::div(plotly::ggplotly(gini), align = "center")
 
 
@@ -1171,6 +1193,7 @@ plot_oob <- model_rf_up_m1$finalModel[["err.rate"]] %>%
             size = 1) +
   xlab("N° Árvores") + ylab("Erro") +
   theme_minimal_hgrid(12) + theme(legend.position = "bottom")
+ggsave(file = "plot_oob.png", plot_oob, width  = 13, height = 9, dpi = 700)
 shiny::div(plotly::ggplotly(plot_oob), align = "center")
 ```
 
