@@ -445,7 +445,7 @@ ggsave(file = "plotx7.png", plotx7, width  = 13, height = 9, dpi = 700)
 plotx7
 ```
 
-# #### 3D interactive
+#### 3D interactive
 
 ```{r, message=FALSE, warning=FALSE, cache = TRUE, fig.align='center'}
 cores <- c("royalblue1", "darkcyan", "green1", "black", "goldenrod3", "red2")
