@@ -1273,6 +1273,13 @@ ggsave(file = "plot_oob.png", plot_oob, width  = 11, height = 7, dpi = 700)
 shiny::div(plotly::ggplotly(plot_oob), align = "center")
 ```
 
+
+
+
+***
+
+## CONSIDERAÇÕES FINAIS
+
 <p style="text-align: justify">
 \
 No presente trabalho fora proposto um modelo preditivo de classificação de vidro multiclasse, utilizando do algoritmo de Random Forest para diferentes cenários e situações de treinamento, dado a condição de desbalanceamento de classes de vidro, para suporte da análise forense. 
@@ -1284,19 +1291,6 @@ Vale a pena ressaltar, também, a importância das técnicas de reamostragem par
 \
 Como sugestão para trabalhos futuros, indicamos a aplicação de técnica de modelos de misturas, tendo em vista as possíveis sub-populações de distribuição dos atributos. Sugerimos também tentativa de técnicas mais robustas para detecção de outliers, como a PCA (Análise de Componentes Principais), e, para a construção de modelo com maior acurácia, a tentativa de emprego de método de super learning poderá proporcionar melhor performance.
 aior opacidade.
-\
-</p>
-
-
-***
-
-## CONSIDERAÇÕES FINAIS
-
-<p style="text-align: justify">
-
-aa...
-\
-Como sugestão para trabalhos futuros, indicamos a aplicação de técnica de modelos de misturas tendo em vista as possíveis sub-populações de distribuição. Sugerimos também a construção de modelos de super learning. 
 \
 </p>
 
