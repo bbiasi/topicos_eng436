@@ -1114,7 +1114,7 @@ plot_x2 <- ggplot2::ggplot(comparacao,
                 (aes(x = variable,
                      y = value,
                      color = Modelo))) +
-  geom_jitter(width = 0.2, alpha = 0.5, size = 3) +
+  geom_jitter(width = 0.2, alpha = 0.5, size = 6) +
   labs(title = "Classificação Vidro",
        x = "Índice",
        y = "Score",
@@ -1142,7 +1142,7 @@ plot_x1 <- df1 %>%
                 modelo = forcats::fct_recode(modelo, "Overs. Cenário 1" = "cm_over_m1"),
                 modelo = forcats::fct_recode(modelo, "Orig. Cenário 2 - B"  = "cm_original_m2bori")) %>% 
   ggplot2::ggplot() +
-  geom_jitter(aes(x = Metrica, y = Valor, col = modelo), alpha = 0.5) +
+  geom_jitter(aes(x = Metrica, y = Valor, col = modelo), alpha = 0.5, size = 5) +
   facet_wrap(~classe, ncol = 6) +
   ylab("Score") +
   theme_bw() +
