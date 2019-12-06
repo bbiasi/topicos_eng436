@@ -25,17 +25,17 @@ p {line-height: 2em;}
 
 
 ```{r settings, include = FALSE}
-knitr::opts_chunk$set(echo = TRUE
-                      , comment = NA
-                      , warning = FALSE
-                      , error = FALSE
-                      , message = FALSE
-                      , tidy = TRUE
-                      , fig.width = 14
-                      , fig.height = 9
-                      , out.width  = "1026"
-                      , out.height = "528"
-                      , fig.align = "center")
+knitr::opts_chunk$set(echo = TRUE,
+                      comment = NA,
+                      warning = FALSE,
+                      error = FALSE,
+                      message = FALSE,
+                      tidy = TRUE,
+                      fig.width = 14,
+                      fig.height = 9,
+                      out.width  = "1026",
+                      out.height = "528",
+                      fig.align = "center")
 ```
 
 
@@ -137,14 +137,23 @@ setwd("D:/PEI/Doc/Disciplinas/Topicos/topicos_eng436")
 {
   if (!require("pacman")) install.packages("pacman")
   
-  pacman::p_load(dplyr, readxl, ggplot2, GGally, lemon, scatterplot3d, skimr, 
+  pacman::p_load(dplyr, readxl, ggplot2, GGally, skimr, 
                  plotly, knitr, tidyr, shiny, caret, randomForest, 
-                 reshape2, multiROC, tibble, rmdformats, cowplot,
+                 reshape2, tibble, rmdformats, cowplot,
                  car, bestNormalize, forcats)
   
   if (!require("gg3D")) remotes::install_github("AckerDWM/gg3D")
   library(gg3D)
 }
+
+# Tema
+tema <- theme_bw() +
+  theme(axis.title   = element_text(color = "black", size = 18, face = "bold"),
+        axis.text.x  = element_text(color = "black", size = 16, face = "bold"),
+        axis.text.y  = element_text(color = "black", size = 16, face = "bold"),
+        legend.text  = element_text(color = "black", size = 12, face = "bold"),
+        legend.title = element_text(color = "black", size = 14, face = "bold"),
+        plot.title   = element_text(color = "black", size = 18, face = "bold"))
 
 set.seed(42)
 dataset <- readxl::read_excel("glass.xlsx")
@@ -213,9 +222,11 @@ plotx <- df %>%
   tidyr::gather("Var", "Valor",-Tipo) %>%
   ggplot2::ggplot() +
   geom_jitter(aes(x = Var, y = Valor, col = Tipo), alpha = 0.6, width = 0.15) +
+  guides(colour = guide_legend(override.aes = list(size = 5))) +
   xlab("Variáveis") +
   ylab("z-score") +
   theme_bw() +
+  tema +
   theme(legend.position = "bottom")
 
 plotx1 <- df %>%
@@ -226,7 +237,8 @@ plotx1 <- df %>%
                alpha = 0.9, show.legend = F, width = 0.4) +
   xlab("Variáveis") +
   ylab("z-score") +
-  theme_bw()
+  theme_bw()  +
+  tema
 plotx8 <- cowplot::plot_grid(plotx, plotx1, align = "hv", axis = "bt")
 
 ggsave(file = "plotx8.png", plotx8, width  = 13, height = 9, dpi = 700)
@@ -353,6 +365,30 @@ plotx <- df %>%
                   upper = list(continuous = wrap("cor", size = 2.5)),
                   lower = list(continuous = wrap("points", alpha = 0.3)))
 shiny::div(plotly::ggplotly(plotx), align = "center")
+```
+
+#### Ca versus Mg, Na
+
+```{r, message=FALSE, warning=FALSE, fig.align='center'}
+plot_b <- df %>%
+  dplyr::filter(Tipo %in% c("X1", "X3"),
+                K < 0.4) %>%
+  ggplot2::ggplot() +
+  geom_point(aes(x = Ca, y = Na, col = Tipo), size = 7, alpha = 0.5) +
+  theme_bw() +
+  tema +
+  theme(legend.position = "bottom")
+plot_b1 <- df %>%
+  dplyr::filter(Tipo %in% c("X1", "X3"),
+                K < 0.4) %>%
+  ggplot2::ggplot() +
+  geom_point(aes(x = Ca, y = Mg, col = Tipo), size = 7, alpha = 0.5) +
+  theme_bw() +
+  tema +
+  theme(legend.position = "bottom")
+plotb <- cowplot::plot_grid(plot_b, plot_b1, align = "hv")
+ggsave(file = "plotb.png", plotb, width  = 13, height = 9, dpi = 700)
+plotb
 ```
 
 #### 3D
@@ -521,7 +557,10 @@ ggsave(file = "plotx5.png", plotx5, width  = 13, height = 9, dpi = 700)
 shiny::div(plotly::ggplotly(plotx5),
            align = "center")
 
-plotx4 <- df_out2 %>%
+df_out2xx <- df_out2 %>% 
+  dplyr::mutate(Out = as.factor(Out))
+levels(df_out2xx$Out) <- c('"Normal"', '"Outlier"')
+plotx4 <- df_out2xx %>%
   dplyr::filter(Variaveis == "Na") %>%
   ggplot2::ggplot() +
   stat_boxplot(aes(x = Tipo, y = valor),
@@ -530,15 +569,16 @@ plotx4 <- df_out2 %>%
                color = "black", show.legend = F, outlier.shape = NA) +
   geom_point(aes(x = Tipo, y = valor,
                  shape = Out, fill = Out, alpha = Out),
-             size = 5, width = 0.2, show.legend = F,
+             size = 5, width = 0.2, 
              position = position_jitter(w = 0.1, h = 0)) +
   scale_shape_manual(values = c(24, 21)) +
   scale_alpha_manual(values = c(0.2, 0.7)) +
   scale_y_continuous(limits = c(min(df_out2$valor), max(df_out2$valor))) +
-  xlab(label = "Tipo") +
-  theme_bw()
-
-ggsave(file = "plotx4.png", plotx4, width  = 13, height = 9, dpi = 700)
+  xlab(label = "Tipo do Vidro") + ylab("Z-Score") +
+  theme_bw() + 
+  tema + theme(legend.position = "bottom")
+plotx4
+ggsave(file = "plotx4.png", plotx4, width  = 11, height = 7, dpi = 700)
 shiny::div(plotly::ggplotly(plotx4),
            align = "center")
 ```
@@ -1092,15 +1132,16 @@ plot_x3 <- ggplot(comparacao,
                   (aes(x = variable,
                        y = value,
                        color = Modelo))) +
-  geom_jitter(width = 0.2, alpha = 0.5, size = 3) +
+  geom_jitter(width = 0.2, alpha = 0.5, size = 7) +
   scale_y_continuous(limits = c(0, 1)) +
-  labs(title = "Classificação Vidro",
+  labs(title = "",
        x = "Índice",
        y = "Score",
        color = "Legenda") +
-  theme_bw()
+  theme_bw() +
+  tema
 
-ggsave(file = "plot_x3.png", plot_x3, width  = 13, height = 9, dpi = 700)
+ggsave(file = "plot_x3.png", plot_x3, width  = 11, height = 7, dpi = 700)
 shiny::div(plotly::ggplotly(plot_x3),
            align = "center")
 ```
@@ -1114,12 +1155,13 @@ plot_x2 <- ggplot2::ggplot(comparacao,
                 (aes(x = variable,
                      y = value,
                      color = Modelo))) +
-  geom_jitter(width = 0.2, alpha = 0.5, size = 6) +
-  labs(title = "Classificação Vidro",
+  geom_jitter(width = 0.2, alpha = 0.5, size = 7) +
+  labs(title = " ",
        x = "Índice",
        y = "Score",
        color = "Legenda") +
-  theme_bw()
+  theme_bw() +
+  tema
 ggsave(file = "plot_x2.png", plot_x2, width  = 13, height = 9, dpi = 700)
 shiny::div(plotly::ggplotly(plot_x2),
            align = "center")
@@ -1142,12 +1184,13 @@ plot_x1 <- df1 %>%
                 modelo = forcats::fct_recode(modelo, "Overs. Cenário 1" = "cm_over_m1"),
                 modelo = forcats::fct_recode(modelo, "Orig. Cenário 2 - B"  = "cm_original_m2bori")) %>% 
   ggplot2::ggplot() +
-  geom_jitter(aes(x = Metrica, y = Valor, col = modelo), alpha = 0.5, size = 5) +
+  geom_jitter(aes(x = Metrica, y = Valor, col = modelo), alpha = 0.5, size = 7) +
   facet_wrap(~classe, ncol = 6) +
-  ylab("Score") +
+  ylab("Score") + xlab("Métrica") +
   theme_bw() +
+  tema +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
-ggsave(file = "plot_x1.png", plot_x1, width  = 13, height = 9, dpi = 700)
+ggsave(file = "plot_x1.png", plot_x1, width  = 13, height = 7, dpi = 700)
 shiny::div(plotly::ggplotly(plot_x1),
            align = "center")
 ```
@@ -1176,9 +1219,9 @@ gini <- varImp(model_rf_up_m1)$importance %>%
   coord_flip() +
   scale_fill_grey() +
   ggtitle("Random Forest - Oversampling - Cenário Inicial") +
-  ylab("Variável") +
+  xlab("Variável") + ylab("Overall") +
   theme_bw() + 
-  theme(plot.title = element_text(color = "black", size = 22, face = "bold"))
+  tema
 ggsave(file = "gini.png", gini, width  = 13, height = 9, dpi = 700)
 shiny::div(plotly::ggplotly(gini), align = "center")
 
@@ -1192,8 +1235,9 @@ plot_oob <- model_rf_up_m1$finalModel[["err.rate"]] %>%
   geom_line(aes(x = Arvores, y = Erro, col = Var), 
             size = 1) +
   xlab("N° Árvores") + ylab("Erro") +
-  theme_minimal_hgrid(12) + theme(legend.position = "bottom")
-ggsave(file = "plot_oob.png", plot_oob, width  = 13, height = 9, dpi = 700)
+  theme_minimal_hgrid(12) + 
+  theme(legend.position = "bottom") + tema
+ggsave(file = "plot_oob.png", plot_oob, width  = 11, height = 7, dpi = 700)
 shiny::div(plotly::ggplotly(plot_oob), align = "center")
 ```
 
