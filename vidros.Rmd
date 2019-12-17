@@ -349,6 +349,16 @@ plotx <- df %>%
                   mapping = aes(color = Tipo, alpha = 0.5),
                   upper = list(continuous = wrap("cor", size = 2.5)),
                   lower = list(continuous = wrap("points", alpha = 0.3)))
+# https://stackoverflow.com/a/34743555/9699371
+for(i in 1:plotx$nrow) {
+  for(j in 1:plotx$ncol){
+    plotx[i,j] <- plotx[i,j] + 
+      scale_fill_manual(values = c(scales::hue_pal()(6)[1],
+                                   scales::hue_pal()(6)[3])) +
+      scale_color_manual(values = c(scales::hue_pal()(6)[1],
+                                      scales::hue_pal()(6)[3])) 
+  }
+}
 shiny::div(plotly::ggplotly(plotx), align = "center")
 ```
 
@@ -380,8 +390,6 @@ plotx <- df %>%
                   mapping = aes(color = Tipo, alpha = 0.5),
                   upper = list(continuous = wrap("cor", size = 2.5)),
                   lower = list(continuous = wrap("points", alpha = 0.3)))
-
-# https://stackoverflow.com/a/34743555/9699371
 for(i in 1:plotx$nrow) {
   for(j in 1:plotx$ncol){
     plotx[i,j] <- plotx[i,j] + 
