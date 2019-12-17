@@ -146,7 +146,7 @@ Abaixo, iniciamos o código indicando o caminho da pasta de trabalho, carregando
   pacman::p_load(dplyr, readxl, ggplot2, GGally, skimr, 
                  plotly, knitr, tidyr, shiny, caret, randomForest, 
                  reshape2, tibble, rmdformats, cowplot,
-                 car, bestNormalize, forcats)
+                 car, bestNormalize, forcats, ggQC, scales, lemon)
   
   if (!require("gg3D")) remotes::install_github("AckerDWM/gg3D")
   library(gg3D)
@@ -249,6 +249,52 @@ plotx8 <- cowplot::plot_grid(plotx, plotx1, align = "hv", axis = "bt", labels = 
 
 ggsave(file = "plotx8.png", plotx8, width  = 13, height = 9, dpi = 700)
 plotx8
+
+#
+#
+plotx <- df %>%
+  dplyr::mutate_at(1:9, funs(scale)) %>%
+  tidyr::gather("Var", "Valor",-Tipo) %>%
+  ggplot2::ggplot(aes(x = Var, y = Valor)) +
+  stat_boxplot(geom ='errorbar', width = 0.2, size = 1) +
+  geom_jitter(aes(fill = Tipo), alpha = 0.3, width = 0.2, shape = 21, size = 3) +
+  facet_wrap(~Tipo) +
+  scale_fill_manual(values = scales::hue_pal()(6)) +
+  guides(fill = guide_legend(override.aes = list(size = 5, alpha = 1))) +
+  xlab("Variáveis") +
+  ylab("z-score") +
+  theme_bw() +
+  tema +
+  theme(legend.position = "bottom", 
+        axis.text.x = element_text(angle = 90))
+
+cores <- c(scales::hue_pal()(6)[2],
+           scales::hue_pal()(6)[1],
+           scales::hue_pal()(6)[6],
+           scales::hue_pal()(6)[3],
+           scales::hue_pal()(6)[4],
+           scales::hue_pal()(6)[5])
+
+
+plotx1 <- df %>% 
+  dplyr::count(Tipo) %>% 
+  ggplot2::ggplot(aes(x = Tipo, y = n)) +
+  ggQC::stat_pareto(point.color = "red",
+                    point.size = 3,
+                    line.color = "black",
+                    bars.fill = cores) +
+  ggplot2::scale_y_continuous(sec.axis = ggplot2::sec_axis(~./(max(.)*.95)*100,
+                                                           name = "% Acumulado de Objetos")) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+  xlab("Tipo") +
+  ylab("Quantidade de Objetos") +
+  theme_bw()  +
+  tema
+
+plotx8 <- cowplot::plot_grid(plotx, plotx1, align = "hv", axis = "bt", labels = c("(A)", "(B)"))
+
+ggsave(file = "plotx8_2.png", plotx8, width  = 13, height = 9, dpi = 700)
+plotx8
 ```
 
 ### Análise 1.2
@@ -334,6 +380,18 @@ plotx <- df %>%
                   mapping = aes(color = Tipo, alpha = 0.5),
                   upper = list(continuous = wrap("cor", size = 2.5)),
                   lower = list(continuous = wrap("points", alpha = 0.3)))
+
+# https://stackoverflow.com/a/34743555/9699371
+for(i in 1:plotx$nrow) {
+  for(j in 1:plotx$ncol){
+    plotx[i,j] <- plotx[i,j] + 
+      scale_fill_manual(values = c(scales::hue_pal()(6)[1],
+                                   scales::hue_pal()(6)[3])) +
+      scale_color_manual(values = c(scales::hue_pal()(6)[1],
+                                      scales::hue_pal()(6)[3])) 
+  }
+}
+
 shiny::div(plotly::ggplotly(plotx), align = "center")
 ```
 
@@ -347,6 +405,15 @@ plotx <- df %>%
                   mapping = aes(color = Tipo, alpha = 0.5),
                   upper = list(continuous = wrap("cor", size = 2.5)),
                   lower = list(continuous = wrap("points", alpha = 0.3)))
+for(i in 1:plotx$nrow) {
+  for(j in 1:plotx$ncol){
+    plotx[i,j] <- plotx[i,j] + 
+      scale_fill_manual(values = c(scales::hue_pal()(6)[1],
+                                   scales::hue_pal()(6)[3])) +
+      scale_color_manual(values = c(scales::hue_pal()(6)[1],
+                                      scales::hue_pal()(6)[3])) 
+  }
+}
 shiny::div(plotly::ggplotly(plotx), align = "center")
 ```
 
@@ -360,6 +427,15 @@ plotx <- df %>%
                   mapping = aes(color = Tipo, alpha = 0.5),
                   upper = list(continuous = wrap("cor", size = 2.5)),
                   lower = list(continuous = wrap("points", alpha = 0.3)))
+for(i in 1:plotx$nrow) {
+  for(j in 1:plotx$ncol){
+    plotx[i,j] <- plotx[i,j] + 
+      scale_fill_manual(values = c(scales::hue_pal()(6)[1],
+                                   scales::hue_pal()(6)[3])) +
+      scale_color_manual(values = c(scales::hue_pal()(6)[1],
+                                      scales::hue_pal()(6)[3])) 
+  }
+}
 shiny::div(plotly::ggplotly(plotx), align = "center")
 ```
 
@@ -373,6 +449,15 @@ plotx <- df %>%
                   mapping = aes(color = Tipo, alpha = 0.5),
                   upper = list(continuous = wrap("cor", size = 2.5)),
                   lower = list(continuous = wrap("points", alpha = 0.3)))
+for(i in 1:plotx$nrow) {
+  for(j in 1:plotx$ncol){
+    plotx[i,j] <- plotx[i,j] + 
+      scale_fill_manual(values = c(scales::hue_pal()(6)[1],
+                                   scales::hue_pal()(6)[3])) +
+      scale_color_manual(values = c(scales::hue_pal()(6)[1],
+                                      scales::hue_pal()(6)[3])) 
+  }
+}
 shiny::div(plotly::ggplotly(plotx), align = "center")
 ```
 
@@ -384,14 +469,19 @@ plot_b <- df %>%
                 K < 0.4) %>%
   ggplot2::ggplot() +
   geom_point(aes(x = Ca, y = Na, col = Tipo), size = 7, alpha = 0.5) +
+  scale_color_manual(values = c(scales::hue_pal()(6)[1],
+                                scales::hue_pal()(6)[3])) + 
   theme_bw() +
   tema +
   theme(legend.position = "bottom")
+
 plot_b1 <- df %>%
   dplyr::filter(Tipo %in% c("X1", "X3"),
                 K < 0.4) %>%
   ggplot2::ggplot() +
   geom_point(aes(x = Ca, y = Mg, col = Tipo), size = 7, alpha = 0.5) +
+  scale_color_manual(values = c(scales::hue_pal()(6)[1],
+                                scales::hue_pal()(6)[3])) + 
   theme_bw() +
   tema +
   theme(legend.position = "bottom")
@@ -1137,22 +1227,24 @@ comparacao <- comparacao %>%
   reshape2::melt(id.vars = c("Modelo"))
 levels(comparacao$variable) <- c("Kappa", "Acurácia")
 
-plot_x3 <- ggplot(comparacao,
-                  (aes(x = variable,
-                       y = value,
-                       color = Modelo))) +
-  geom_jitter(width = 0.2, alpha = 0.5, size = 7) +
-  scale_y_continuous(limits = c(0, 1)) +
+plot_x3 <- ggplot(comparacao) +
+  geom_jitter(aes(x = variable,
+                  y = value,
+                  fill = Modelo),
+              width = 0.2, alpha = 0.7, size = 7, shape = 24) +
+  facet_grid(.~variable, scales = "free") +
+  # scale_y_continuous(limits = c(0, 1)) +
   labs(title = "",
        x = "Índice",
        y = "Score",
        color = "Legenda") +
   theme_bw() +
-  tema
+  tema +
+  theme(strip.background = element_blank(),
+        strip.text = element_blank())
 
 ggsave(file = "plot_x3.png", plot_x3, width  = 11, height = 7, dpi = 700)
-shiny::div(plotly::ggplotly(plot_x3),
-           align = "center")
+plot_x3
 ```
 
 
@@ -1163,17 +1255,23 @@ comparacao <- comparacao %>%
 plot_x2 <- ggplot2::ggplot(comparacao,
                 (aes(x = variable,
                      y = value,
-                     color = Modelo))) +
-  geom_jitter(width = 0.2, alpha = 0.5, size = 7) +
+                     fill = Modelo))) +
+  geom_jitter(width = 0.2, alpha = 0.7, size = 7, shape = 24) +
+  scale_fill_manual(values = c(scales::hue_pal()(12)[1],
+                               scales::hue_pal()(12)[2],
+                               scales::hue_pal()(12)[5],
+                               scales::hue_pal()(12)[8])) +
+  facet_wrap(~variable, scales = "free") +
   labs(title = " ",
        x = "Índice",
        y = "Score",
        color = "Legenda") +
   theme_bw() +
-  tema
+  tema +
+  theme(strip.background = element_blank(),
+        strip.text = element_blank())
 ggsave(file = "plot_x2.png", plot_x2, width  = 13, height = 9, dpi = 700)
-shiny::div(plotly::ggplotly(plot_x2),
-           align = "center")
+plot_x2
 ```
 
 
@@ -1190,11 +1288,15 @@ plot_x1 <- df1 %>%
                 Metrica = forcats::fct_recode(Metrica, "Sensibilidade"  = "Sensitivity"),
                 Metrica = forcats::fct_recode(Metrica, "Especificidade" = "Specificity"),
                 
-                modelo = forcats::fct_recode(modelo, "Overs. Cenário 1" = "cm_over_m1"),
+                modelo = forcats::fct_recode(modelo, "Overs. Cenário Inic." = "cm_over_m1"),
                 modelo = forcats::fct_recode(modelo, "Orig. Cenário 2 - B"  = "cm_original_m2bori")) %>% 
+  dplyr::rename(Modelo = "modelo") %>% 
   ggplot2::ggplot() +
-  geom_jitter(aes(x = Metrica, y = Valor, col = modelo), alpha = 0.5, size = 7) +
+  geom_jitter(aes(x = Metrica, y = Valor, fill = Modelo), 
+              alpha = 0.7, size = 7, shape = 24) +
   facet_wrap(~classe, ncol = 6) +
+  scale_fill_manual(values = c(scales::hue_pal()(12)[8],
+                               scales::hue_pal()(12)[2])) +
   ylab("Score") + xlab("Métrica") +
   theme_bw() +
   tema +
@@ -1259,6 +1361,59 @@ shiny::div(plotly::ggplotly(gini), align = "center")
 
 
 # OOB
+plot_oo1 <- model_rf_up_m1$finalModel[["err.rate"]] %>% 
+  as.data.frame() %>% 
+  dplyr::mutate(Arvores = 1:arvores) %>% 
+  tidyr::gather("Var", "Erro", -Arvores) %>% 
+  dplyr::filter(Var %in% c("OOB", "X1", "X2")) %>% 
+  ggplot2::ggplot() +
+  geom_line(aes(x = Arvores, y = Erro, col = Var), 
+            size = 1) +
+  scale_color_manual(values = c("black",
+                                scales::hue_pal()(6)[1],
+                                scales::hue_pal()(6)[2])) +
+  xlab("N° Árvores") + ylab("Erro") +
+  theme_minimal_hgrid(12) + 
+  theme(legend.position = "bottom") + tema
+shiny::div(plotly::ggplotly(plot_oo1), align = "center")
+
+plot_oo2 <- model_rf_up_m1$finalModel[["err.rate"]] %>% 
+  as.data.frame() %>% 
+  dplyr::mutate(Arvores = 1:arvores) %>% 
+  tidyr::gather("Var", "Erro", -Arvores) %>% 
+  dplyr::filter(Var %in% c("OOB", "X3", "X5", "X6", "X7")) %>% 
+  ggplot2::ggplot() +
+  geom_line(aes(x = Arvores, y = Erro, col = Var), 
+            size = 1) +
+  scale_color_manual(values = c("black",
+                                scales::hue_pal()(6)[3],
+                                scales::hue_pal()(6)[4],
+                                scales::hue_pal()(6)[5],
+                                scales::hue_pal()(6)[6])) +
+  xlab("N° Árvores") + ylab("Erro") +
+  theme_minimal_hgrid(12) + 
+  theme(legend.position = "bottom") + tema
+
+plot_oo3 <- model_rf_up_m1$finalModel[["err.rate"]] %>% 
+  as.data.frame() %>% 
+  dplyr::mutate(Arvores = 1:arvores) %>% 
+  tidyr::gather("Var", "Erro", -Arvores) %>% 
+  dplyr::filter(Var %in% c("X3", "X5", "X6", "X7")) %>% 
+  ggplot2::ggplot() +
+  geom_line(aes(x = Arvores, y = Erro, col = Var), 
+            size = 1) +
+  scale_color_manual(values = c(scales::hue_pal()(6)[3],
+                                scales::hue_pal()(6)[4],
+                                scales::hue_pal()(6)[5],
+                                scales::hue_pal()(6)[6])) +
+  xlab("N° Árvores") + ylab("Erro") +
+  theme_minimal_hgrid(12) + 
+  theme(legend.position = "bottom") + tema
+
+plot_oo3 <- cowplot::plot_grid(plot_oo2, plot_oo3, align = "hv", rows = 2, axis = "bt")
+cowplot::plot_grid(plot_oo1, plot_oo3, align = "hv", cols = 2, axis = "bt")
+
+
 plot_oob <- model_rf_up_m1$finalModel[["err.rate"]] %>% 
   as.data.frame() %>% 
   dplyr::mutate(Arvores = 1:arvores) %>% 
@@ -1266,9 +1421,17 @@ plot_oob <- model_rf_up_m1$finalModel[["err.rate"]] %>%
   ggplot2::ggplot() +
   geom_line(aes(x = Arvores, y = Erro, col = Var), 
             size = 1) +
+  scale_color_manual(values = c("black",
+                                scales::hue_pal()(6)[1],
+                                scales::hue_pal()(6)[2],
+                                scales::hue_pal()(6)[3],
+                                scales::hue_pal()(6)[4],
+                                scales::hue_pal()(6)[5],
+                                scales::hue_pal()(6)[6])) +
   xlab("N° Árvores") + ylab("Erro") +
   theme_minimal_hgrid(12) + 
   theme(legend.position = "bottom") + tema
+
 ggsave(file = "plot_oob.png", plot_oob, width  = 11, height = 7, dpi = 700)
 shiny::div(plotly::ggplotly(plot_oob), align = "center")
 ```
