@@ -1453,15 +1453,30 @@ shiny::div(plotly::ggplotly(plot_oob), align = "center")
 
 <p style="text-align: justify">
 \
-No presente trabalho fora proposto um modelo preditivo de classificação de vidro multiclasse, utilizando do algoritmo de Random Forest para diferentes cenários e situações de treinamento, dado a condição de desbalanceamento de classes de vidro, para suporte da análise forense. 
-O algoritmo mostrou-se eficiente visto que o resultado final compôs um valor de acurácia de 80,33%, ou seja, 49 de 61 observações, superior ao modelo original. 
+No presente trabalho fora proposto um modelo preditivo de classificação de vidro
+multiclasse, utilizando do algoritmo de Random Forest para diferentes cenários e situações
+de treinamento, dado a condição de desbalanceamento de classes de vidro, para suporte da
+análise forense.
 \
-Como indicado por Breiman (2001), o algoritmo de Random Forest é robusto para ruídos e problemas não-lineares, e apesar da remoção de alguns objetos com valores aberrantes porém no cenário inicial proposto, sem transformação ou adição de variáveis incrementadoras de performance, o algoritmo apresentou melhor resultado. 
+O algoritmo mostrou-se eficiente visto que o resultado final compôs um valor de acurácia
+de 80,33%, ou seja, 49 de 61 observações, superior ao modelo original.
 \
-Vale a pena ressaltar, também, a importância das técnicas de reamostragem para construção de modelos preditivos em condições de desbalanceamento de classes, haja visto que o modelo proposto no presente artigo foi concebido utilizando a técnica de oversampling.
+Como indicado por Breiman (2001), apesar de o algoritmo de Random Forest ser
+robusto para ruídos e outliers, o modelo de melhor performance foi construído a partir da a
+remoção de potenciais outliers. Deste modo, fica evidente a importância das técnicas de 
+reamostragem para construção de modelos preditivos em condições de desbalanceamento
+de classes, haja visto que o modelo proposto no presente artigo foi concebido utilizando a
+técnica de *oversampling*.
 \
-Como sugestão para trabalhos futuros, indicamos a aplicação de técnica de modelos de misturas, tendo em vista as possíveis sub-populações de distribuição dos atributos. Sugerimos também tentativa de técnicas mais robustas para detecção de outliers, como a PCA (Análise de Componentes Principais), e, para a construção de modelo com maior acurácia, a tentativa de emprego de método de super learning poderá proporcionar melhor performance.
-aior opacidade.
+Para a não-linearidade do problema, difícil segmentação de classes, o algoritmo
+utilizado apresenta resultados satisfatórios, inclusive para situações com pequeno número de
+objetos, como o vidro do tipo **X3**.
+\
+Como sugestão para trabalhos futuros, indicamos a aplicação de técnica de modelos de
+misturas, tendo em vista as possíveis subpopulações de distribuição dos atributos. Sugerimos
+também tentativa de técnicas mais robustas para detecção de outliers, como a PCA (Análise
+de Componentes Principais), e, para a construção de modelo com maior acurácia, a tentativa
+de emprego de método de super learning poderá proporcionar melhor performance.
 \
 </p>
 
