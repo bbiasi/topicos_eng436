@@ -256,7 +256,7 @@ plotx <- df %>%
   dplyr::mutate_at(1:9, funs(scale)) %>%
   tidyr::gather("Var", "Valor",-Tipo) %>%
   ggplot2::ggplot(aes(x = Var, y = Valor)) +
-  stat_boxplot(geom ='errorbar', width = 0.2, size = 1) +
+  stat_boxplot(geom ='errorbar', width = 0.6, size = 0.8) +
   geom_jitter(aes(fill = Tipo), alpha = 0.3, width = 0.2, shape = 21, size = 3) +
   facet_wrap(~Tipo) +
   scale_fill_manual(values = scales::hue_pal()(6)) +
